@@ -7,9 +7,13 @@ A real-time collaborative document editing platform built with Node.js, Express,
 ```
 SyncDocs/
 ├── backend/          # Express API & Socket.IO server
+│   ├── prisma/
+│   │   └── schema.prisma
 │   ├── src/
 │   │   ├── controllers/
 │   │   ├── routes/
+│   │   ├── lib/
+│   │   │   └── prisma.ts
 │   │   ├── app.ts
 │   │   └── index.ts
 │   └── .env.example
@@ -25,6 +29,13 @@ SyncDocs/
 │   └── .env.example
 └── README.md
 ```
+
+## Database Schema (PostgreSQL + Prisma)
+
+- **User**: `id`, `name`, `email` (unique), `password`, `createdAt`
+- **Document**: `id`, `ownerId`, `title`, `content`, `createdAt`, `updatedAt`
+- **DocumentAccess**: `id`, `documentId`, `userId`, `role` (`OWNER`, `EDITOR`, `VIEWER`)
+- **EditEvent**: `id`, `documentId`, `userId`, `changeSummary`, `createdAt`
 
 ## API Endpoints
 
