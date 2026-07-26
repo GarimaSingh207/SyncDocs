@@ -1,14 +1,94 @@
-# SyncDocs
+# SyncDocs — Real-Time Collaborative Document Editing Platform
 
-A real-time collaborative document editing platform built with Node.js, Express, PostgreSQL, Prisma, Socket.IO, and React.
+SyncDocs is a production-ready, full-stack real-time collaborative document editing platform designed to showcase core backend architecture, state synchronization, role-based security, and reactive frontend engineering.
 
-## Project Structure
+Built with **TypeScript**, **Node.js**, **Express**, **PostgreSQL**, **Prisma ORM**, **Socket.IO**, and **React (Vite)**.
+
+---
+
+## 🌟 Key Features
+
+### 🔐 Authentication & Authorization
+- **JWT & bcrypt Security**: Password hashing with 10 salt rounds and 24-hour signed JWT tokens.
+- **Protected Routing**: React Router context wrappers ensuring unauthorized visitors are directed to login.
+- **Fine-Grained Role-Based Access Control (RBAC)**:
+  - **OWNER**: Full CRUD, sharing management, collaborator role modification, document deletion.
+  - **EDITOR**: Read and edit document title and content; cannot manage collaborators or delete documents.
+  - **VIEWER**: Read-only access; UI inputs disabled, REST persistence blocked (`403 Forbidden`), socket update events rejected.
+
+### 📄 Document Management & Sharing
+- **Document CRUD**: Create, rename, delete, and list owned documents.
+- **Collaborator Management**: Invite team members by email with specific roles (`EDITOR` / `VIEWER`), change roles dynamically, or revoke access.
+- **Filtered Workspaces**: Dedicated "My Documents" and "Shared With Me" dashboard sections.
+
+### ⚡ Real-Time Collaboration & Presence
+- **Socket.IO Integration**: Shared HTTP server running on port 5000 with Express.
+- **Socket JWT Authentication**: Websockets validate token payloads on handshake (`connection_error` for invalid/missing tokens).
+- **Document Room Isolation**: Isolated rooms (`document:<id>`) enforcing access validation before allowing room subscription.
+- **Live Active Presence**: Realtime tracking broadcasting active users and their roles (`room-users`).
+- **Low-Latency Collaborative Sync**: Keystrokes broadcast live to peers with Last Write Wins (LWW) resolution and infinite update loop prevention.
+- **Late-Joiner Synchronization**: State sync protocol (`document-request-sync` and `document-sync`) ensuring newly connected peers acquire the current in-memory editor state.
+
+### 💾 Debounced Auto-Save & Audit Logging
+- **Debounced Persistence**: Background auto-save to PostgreSQL triggering after 800ms of user inactivity, preventing excessive REST calls.
+- **Save Status Lifecycle**: Visual indicators tracking status: `✓ Saved`, `● Saving...`, `● Unsaved`, `⚠ Save failed`.
+- **Unmount Flushing**: Flushes pending unsaved edits to PostgreSQL before component unmount or route navigation.
+- **Immutable Audit Logging**: Every successful persistence creates an `EditEvent` entry storing editor identity, timestamp, and revision snapshots.
+- **Lazy-Loaded History Drawer**: Paginated edit history timeline displaying relative timestamps (*"Just now"*, *"5 minutes ago"*) and content previews.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | React 18, Vite, TypeScript, React Router v6, Axios, Socket.IO Client, CSS3 |
+| **Backend** | Node.js, Express.js, TypeScript, Socket.IO Server, Zod Validation, jsonwebtoken, bcryptjs |
+| **Database & ORM** | PostgreSQL, Prisma ORM |
+| **Testing & Tooling** | Node.js Test Harness, tsx, tsc |
+
+---
+
+## 🏗️ Architecture Overview
+
+```
+                            ┌──────────────────────────────────────┐
+                            │          React Frontend (Vite)       │
+                            │  (AuthContext, SocketContext, UI)   │
+                            └──────────────────┬───────────────────┘
+                                               │
+                                      HTTP / WebSockets
+                                               │
+                                               ▼
+                            ┌──────────────────────────────────────┐
+                            │    Node.js HTTP Server (Port 5000)   │
+                            ├──────────────────┬───────────────────┤
+                            │   Express REST   │   Socket.IO Server│
+                            │ (Auth, Docs,     │ (Rooms, Presence, │
+                            │  Sharing, Audit) │  Realtime Edits)  │
+                            └────────┬─────────┴─────────┬─────────┘
+                                     │                   │
+                                     ▼                   ▼
+                            ┌──────────────────────────────────────┐
+                            │             Prisma ORM               │
+                            └──────────────────┬───────────────────┘
+                                               │
+                                               ▼
+                            ┌──────────────────────────────────────┐
+                            │        PostgreSQL Database           │
+                            │  (User, Document, Access, EditEvent) │
+                            └──────────────────────────────────────┘
+```
+
+---
+
+## 📁 Project Structure
 
 ```
 SyncDocs/
-├── backend/          # Express API & Socket.IO server
+├── backend/                  # Express API & Socket.IO Server
 │   ├── prisma/
-│   │   └── schema.prisma
+│   │   └── schema.prisma     # Prisma Data Model (User, Document, DocumentAccess, EditEvent)
 │   ├── src/
 │   │   ├── controllers/
 │   │   │   ├── auth.controller.ts
@@ -36,7 +116,7 @@ SyncDocs/
 │   │   ├── app.ts
 │   │   └── index.ts
 │   └── .env.example
-├── frontend/         # React SPA frontend (Vite + TypeScript)
+├── frontend/                 # React SPA Frontend (Vite + TypeScript)
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── Navbar.tsx
@@ -66,80 +146,104 @@ SyncDocs/
 └── README.md
 ```
 
-## Database Schema (PostgreSQL + Prisma)
+---
 
-- **User**: `id`, `name`, `email` (unique), `password`, `createdAt`
-- **Document**: `id`, `ownerId`, `title`, `content`, `createdAt`, `updatedAt`
-- **DocumentAccess**: `id`, `documentId`, `userId`, `role` (`OWNER`, `EDITOR`, `VIEWER`)
-- **EditEvent**: `id`, `documentId`, `userId`, `changeSummary`, `createdAt`
+## ⚙️ Environment Variables
 
-## API Endpoints
+### Backend (`backend/.env`)
+```env
+PORT=5000
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/syncdocs?schema=public"
+JWT_SECRET="your_secure_jwt_secret_key_here"
+NODE_ENV="development"
+```
+
+### Frontend (`frontend/.env`)
+```env
+VITE_API_URL="http://localhost:5000/api"
+```
+
+---
+
+## 🚀 Local Installation & Setup Guide
+
+### Prerequisites
+- **Node.js** (v18 or higher)
+- **PostgreSQL** running locally or via Docker
+
+### 1. Clone & Setup Backend
+```bash
+cd backend
+npm install
+npx prisma db push
+npm run build
+```
+
+### 2. Setup Frontend
+```bash
+cd ../frontend
+npm install
+npm run build
+```
+
+### 3. Run Development Servers
+- **Backend**: `npm run dev` in `backend/` (Runs on `http://localhost:5000`)
+- **Frontend**: `npm run dev` in `frontend/` (Runs on `http://localhost:5173`)
+
+---
+
+## 📡 REST API Reference
 
 ### Health Check
-- `GET /api/health` — Returns status of backend server
+- `GET /api/health` — Backend server health status.
 
 ### Authentication
-- `POST /api/auth/register` — Register a new user (`name`, `email`, `password`)
-- `POST /api/auth/login` — Authenticate user and receive JWT token (`email`, `password`)
-- `GET /api/profile` — Get authenticated user profile (`Authorization: Bearer <token>`)
+- `POST /api/auth/register` — Register user (`name`, `email`, `password`).
+- `POST /api/auth/login` — Login user (`email`, `password`) -> Returns JWT token.
+- `GET /api/profile` — Get authenticated user details.
 
-### Documents & Authorization
-- `GET /api/documents` — Get documents owned by authenticated user (ordered by `updatedAt` desc)
-- `POST /api/documents` — Create a new document (`title`)
-- `GET /api/documents/:id` — Get document details by ID (Accessible by `OWNER`, `EDITOR`, `VIEWER`)
-- `PATCH /api/documents/:id` — Update document title/content (Accessible by `OWNER` & `EDITOR`, `403` for `VIEWER`). Automatically creates an immutable `EditEvent` log upon success.
-- `DELETE /api/documents/:id` — Delete document by ID (`OWNER` only)
+### Documents & RBAC
+- `GET /api/documents` — List owned documents (newest updated first).
+- `POST /api/documents` — Create a new document (`title`).
+- `GET /api/documents/:id` — Get document details (`OWNER`, `EDITOR`, `VIEWER`).
+- `PATCH /api/documents/:id` — Update document title/content (`OWNER` & `EDITOR` only; logs `EditEvent`).
+- `DELETE /api/documents/:id` — Delete document by ID (`OWNER` only).
 
-### Document Edit History & Audit Logging
-- `GET /api/documents/:id/history` — Get paginated edit audit history for document (`page`, `limit`). Accessible by `OWNER`, `EDITOR`, `VIEWER`. Returns events ordered newest first with editor details and title/content snapshots.
+### Sharing & Collaborators
+- `GET /api/documents/shared` — Get documents shared with user.
+- `GET /api/documents/:id/access` — Get access list for document (`OWNER` only).
+- `POST /api/documents/:id/share` — Invite user by email & role (`OWNER` only).
+- `PATCH /api/documents/:id/access/:accessId` — Update collaborator role (`OWNER` only).
+- `DELETE /api/documents/:id/access/:accessId` — Revoke collaborator access (`OWNER` only).
 
-### Sharing & Collaborator Management (Owner Only)
-- `GET /api/documents/shared` — Get documents shared with authenticated user
-- `GET /api/documents/:id/access` — Get list of collaborators with access (`OWNER` only)
-- `POST /api/documents/:id/share` — Share document with user by email & role (`EDITOR` / `VIEWER`)
-- `PATCH /api/documents/:id/access/:accessId` — Update collaborator role (`EDITOR` / `VIEWER`)
-- `DELETE /api/documents/:id/access/:accessId` — Revoke collaborator access
+### Edit History & Audit Logging
+- `GET /api/documents/:id/history` — Get paginated edit audit logs (`page`, `limit`).
 
-## Socket.IO Events & Realtime Architecture
+---
 
-### Socket Authentication
-Every incoming socket connection must present a valid JWT token via `socket.handshake.auth.token`. Missing or invalid tokens result in connection rejection (`connect_error`).
+## ⚡ Socket.IO Event Reference
 
-### Realtime Events
-- `join-document` — Sent by client with `{ documentId }`. Verifies document access (OWNER, EDITOR, VIEWER) before joining room `document:<documentId>`.
-- `leave-document` — Sent by client with `{ documentId }`. Leaves room `document:<documentId>`.
-- `room-users` — Broadcast by server to room `document:<documentId>` whenever active presence changes. Transmits active users list `[{ userId, name, role }]`.
-- `document-update` — Emitted by `OWNER` or `EDITOR` with `{ documentId, title, content }`. Server broadcasts payload to all other room occupants (`socket.to(room).emit(...)`). Viewers attempting to emit receive an `error` event.
-- `document-request-sync` — Emitted by newly joined clients to request current state.
-- `document-sync` — Emitted by existing connected editors responding to a state sync request.
-- `error` — Emitted to client when an unauthorized action or room join attempt is made.
+| Event Name | Direction | Description |
+| :--- | :--- | :--- |
+| `connection` | Client -> Server | Handshake carrying JWT token payload. |
+| `join-document` | Client -> Server | Joins room `document:<id>` after permission check. |
+| `leave-document` | Client -> Server | Leaves room `document:<id>`. |
+| `room-users` | Server -> Room | Broadcasts active room users and roles `[{ userId, name, role }]`. |
+| `document-update` | Client -> Server -> Room | Broadcasts live title/content keystrokes to room peers. |
+| `document-request-sync` | Client -> Server -> Room | Requests current state from existing room occupants. |
+| `document-sync` | Client -> Server -> Client | Sends state back directly to late-joining peer. |
+| `error` | Server -> Client | Sent when unauthorized action or room join is attempted. |
 
-## Auto-Save & Persistence Architecture
-- **Debounced Save (800ms)**: Automatically persists changes to PostgreSQL after 800ms of user inactivity. Keystrokes reset the timer to prevent unnecessary REST requests.
-- **Save Status Lifecycle**:
-  - `saved`: `✓ Saved`
-  - `saving`: `● Saving...`
-  - `unsaved`: `● Unsaved`
-  - `error`: `⚠ Save failed`
-- **Remote Edit Isolation**: Incoming socket updates update in-memory state and baseline refs without scheduling REST auto-save calls.
-- **Unmount Flush**: Pending unsaved edits are flushed immediately to the backend when navigating away or unmounting.
+---
 
-## Frontend Routes
+## 🖼️ Screenshots Section (Placeholder)
 
-- `/` — Redirects to `/dashboard` if logged in, else `/login`
-- `/login` — Login Page with validation & error handling
-- `/register` — Registration Page with validation & error handling
-- `/dashboard` — Protected Dashboard with total document statistics and top 5 recent documents
-- `/documents` — Protected Documents List Page featuring "My Documents" and "Shared With Me" sections
-- `/documents/:id` — Protected Document Editor Page featuring debounced auto-save, save status lifecycle indicators, realtime collaborative synchronization, Last Write Wins (LWW) conflict handling, live connection indicator (`● Live`), presence bar, and lazy-loaded Edit History drawer
+> *Dashboard Overview, Collaborative Document Editor, Share Collaborators Panel, and Edit History Timeline.*
 
-## Features
+---
 
-- **Authentication**: User Registration & Login with JWT & bcrypt (persisted via `localStorage` with `AuthContext` and `ProtectedRoute` wrappers)
-- **Document Management**: Create, Rename, Delete, List owned documents with owner authorization
-- **Document Sharing**: Invite users by email with roles (`OWNER`, `EDITOR`, `VIEWER`), update roles, or revoke access
-- **Access Control**: Enforced permissions on REST APIs (Owner = Full, Editor = Read/Edit, Viewer = Read Only)
-- **Socket.IO Foundation**: Authenticated websockets, room isolation (`document:<id>`), and active user presence tracking
-- **Realtime Editing**: Collaborative editing using Socket.IO room broadcast with Last Write Wins (LWW) resolution and infinite loop prevention
-- **Debounced Auto-Save**: Seamless 800ms background persistence to PostgreSQL with unmount flushing and status indicators
-- **Edit History & Audit Logging**: Immutable `EditEvent` logging on every successful save with paginated REST endpoints and lazy-loaded frontend drawer
+## 🔮 Future Improvements
+- Operational Transformation (OT) or CRDT integration for concurrent character cursor offsets.
+- Live cursor position indicators showing collaborator caret locations.
+- Rich-text WYSIWYG editor support (Quill or Tiptap).
+- Version rollback restoring document content from historical `EditEvent` snapshots.
