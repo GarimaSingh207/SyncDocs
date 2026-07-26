@@ -142,6 +142,54 @@ export const initSocket = (httpServer: HttpServer) => {
       }
     });
 
+    // Event: document-update
+    socket.on(
+      SOCKET_EVENTS.DOCUMENT_UPDATE,
+      (data: { documentId: string; title?: string; content?: string }) => {
+        const { documentId, title, content } = data;
+        const currentDocId = socket.data.currentDocumentId;
+        const role = socket.data.role;
+
+        if (!documentId || documentId !== currentDocId) {
+          return socket.emit(SOCKET_EVENTS.ERROR, { message: 'You are not connected to this document room' });
+        }
+
+        if (!role || (role !== Role.OWNER && role !== Role.EDITOR)) {
+          return socket.emit(SOCKET_EVENTS.ERROR, { message: 'Viewers cannot edit documents' });
+        }
+
+        const roomName = `document:${documentId}`;
+
+        // Broadcast update to everyone in room except originating socket
+        socket.to(roomName).emit(SOCKET_EVENTS.DOCUMENT_UPDATE, {
+          documentId,
+          title,
+          content,
+          updatedBy: socket.data.user?.name,
+        });
+      }
+    );
+
+    // Event: document-request-sync (late joiner requests latest state)
+    socket.on(SOCKET_EVENTS.DOCUMENT_REQUEST_SYNC, (data: { documentId: string }) => {
+      const { documentId } = data;
+      const roomName = `document:${documentId}`;
+      socket.to(roomName).emit(SOCKET_EVENTS.DOCUMENT_REQUEST_SYNC, {
+        requesterSocketId: socket.id,
+      });
+    });
+
+    // Event: document-sync (existing client responds with state)
+    socket.on(
+      SOCKET_EVENTS.DOCUMENT_SYNC,
+      (data: { targetSocketId: string; title: string; content: string }) => {
+        const { targetSocketId, title, content } = data;
+        if (targetSocketId) {
+          io.to(targetSocketId).emit(SOCKET_EVENTS.DOCUMENT_SYNC, { title, content });
+        }
+      }
+    );
+
     // Event: leave-document
     socket.on(SOCKET_EVENTS.LEAVE_DOCUMENT, async (data: { documentId: string }) => {
       try {
