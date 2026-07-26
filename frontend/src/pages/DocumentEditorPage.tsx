@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { Document, Role, Collaborator } from '../types';
+import type { Document, Role, Collaborator, EditEventItem } from '../types';
 import documentService from '../services/documents';
 import sharingService from '../services/sharing';
+import historyService from '../services/history';
 import useSocket from '../hooks/useSocket';
 import axios from 'axios';
 
@@ -13,6 +14,31 @@ interface RoomUser {
 }
 
 type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';
+
+// Helper function for human-readable timestamps
+function formatTimeAgo(isoString: string): string {
+  const date = new Date(isoString);
+  const now = new Date();
+  const secondsAgo = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (secondsAgo < 10) return 'Just now';
+  if (secondsAgo < 60) return `${secondsAgo} seconds ago`;
+  const minutesAgo = Math.floor(secondsAgo / 60);
+  if (minutesAgo < 60) return `${minutesAgo} minute${minutesAgo === 1 ? '' : 's'} ago`;
+  const hoursAgo = Math.floor(minutesAgo / 60);
+  if (hoursAgo < 24) return `${hoursAgo} hour${hoursAgo === 1 ? '' : 's'} ago`;
+  const daysAgo = Math.floor(hoursAgo / 24);
+  if (daysAgo === 1) return 'Yesterday';
+  if (daysAgo < 7) return `${daysAgo} days ago`;
+
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 export const DocumentEditorPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -47,7 +73,7 @@ export const DocumentEditorPage: React.FC = () => {
   // Presence State
   const [activeRoomUsers, setActiveRoomUsers] = useState<RoomUser[]>([]);
 
-  // Sharing state
+  // Sharing State
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [shareEmail, setShareEmail] = useState('');
@@ -55,6 +81,14 @@ export const DocumentEditorPage: React.FC = () => {
   const [shareLoading, setShareLoading] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
   const [shareSuccess, setShareSuccess] = useState<string | null>(null);
+
+  // History Drawer State (Lazy Loaded)
+  const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
+  const [historyEvents, setHistoryEvents] = useState<EditEventItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState<boolean>(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [historyPage, setHistoryPage] = useState<number>(1);
+  const [hasMoreHistory, setHasMoreHistory] = useState<boolean>(false);
 
   // Execute Persistence Request to Backend
   const performSave = useCallback(
@@ -153,10 +187,12 @@ export const DocumentEditorPage: React.FC = () => {
         id &&
         titleRef.current.trim()
       ) {
-        documentService.updateDocument(id, {
-          title: titleRef.current.trim(),
-          content: contentRef.current,
-        }).catch((e) => console.error('Unmount save failed:', e));
+        documentService
+          .updateDocument(id, {
+            title: titleRef.current.trim(),
+            content: contentRef.current,
+          })
+          .catch((e) => console.error('Unmount save failed:', e));
       }
     };
   }, [id]);
@@ -165,16 +201,13 @@ export const DocumentEditorPage: React.FC = () => {
   useEffect(() => {
     if (!id || !socket || !connected || !document) return;
 
-    // Join document room
     socket.emit('join-document', { documentId: id });
     socket.emit('document-request-sync', { documentId: id });
 
-    // Listen for presence updates
     const handleRoomUsers = (users: RoomUser[]) => {
       setActiveRoomUsers(users);
     };
 
-    // Listen for remote document updates
     const handleDocumentUpdate = (data: {
       documentId: string;
       title?: string;
@@ -203,7 +236,6 @@ export const DocumentEditorPage: React.FC = () => {
       setTimeout(() => setRemoteNotice(null), 3000);
     };
 
-    // Listen for sync request from late joiners
     const handleRequestSync = (data: { requesterSocketId: string }) => {
       if (userRoleRef.current === 'OWNER' || userRoleRef.current === 'EDITOR') {
         socket.emit('document-sync', {
@@ -214,7 +246,6 @@ export const DocumentEditorPage: React.FC = () => {
       }
     };
 
-    // Listen for direct sync payload
     const handleDocumentSync = (data: { title: string; content: string }) => {
       isRemoteEditRef.current = true;
       setTitle(data.title);
@@ -245,6 +276,45 @@ export const DocumentEditorPage: React.FC = () => {
       socket.off('error', handleSocketError);
     };
   }, [id, socket, connected, document]);
+
+  // Lazy Load History on Panel Toggle
+  const loadHistory = async (pageNum: number = 1, append: boolean = false) => {
+    if (!id) return;
+
+    setHistoryLoading(true);
+    setHistoryError(null);
+
+    try {
+      const res = await historyService.getDocumentHistory(id, pageNum, 10);
+      if (append) {
+        setHistoryEvents((prev) => [...prev, ...res.events]);
+      } else {
+        setHistoryEvents(res.events);
+      }
+      setHistoryPage(res.pagination.page);
+      setHasMoreHistory(res.pagination.page < res.pagination.totalPages);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        setHistoryError(err.response.data.message);
+      } else {
+        setHistoryError('Failed to load history.');
+      }
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleToggleHistoryDrawer = () => {
+    const nextState = !showHistoryDrawer;
+    setShowHistoryDrawer(nextState);
+    if (nextState) {
+      loadHistory(1, false);
+    }
+  };
+
+  const handleLoadMoreHistory = () => {
+    loadHistory(historyPage + 1, true);
+  };
 
   // Handle Title Change (Local input)
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -396,6 +466,11 @@ export const DocumentEditorPage: React.FC = () => {
 
           <span className={`role-badge role-${userRole.toLowerCase()}`}>{userRole}</span>
 
+          {/* History Drawer Toggle */}
+          <button onClick={handleToggleHistoryDrawer} className="btn btn-secondary">
+            📜 History
+          </button>
+
           {userRole === 'OWNER' && (
             <button onClick={handleOpenShareModal} className="btn btn-secondary">
               👥 Share
@@ -428,6 +503,71 @@ export const DocumentEditorPage: React.FC = () => {
           }}
         >
           ⚡ {remoteNotice}
+        </div>
+      )}
+
+      {/* History Drawer Panel */}
+      {showHistoryDrawer && (
+        <div
+          className="history-panel"
+          style={{
+            backgroundColor: '#111827',
+            padding: '1.5rem',
+            borderRadius: '8px',
+            border: '1px solid #374151',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h3 style={{ margin: 0, color: '#f3f4f6' }}>📜 Edit History & Audit Logs</h3>
+            <button onClick={handleToggleHistoryDrawer} className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}>
+              Close ✕
+            </button>
+          </div>
+
+          {historyError && <div className="alert alert-error">{historyError}</div>}
+
+          {historyLoading && historyEvents.length === 0 ? (
+            <p style={{ color: '#9ca3af', textAlign: 'center', padding: '1rem 0' }}>Loading edit history...</p>
+          ) : historyEvents.length === 0 ? (
+            <p style={{ color: '#9ca3af', textAlign: 'center', padding: '1rem 0' }}>No edit history logged yet. Edits will appear here after auto-saving!</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              {historyEvents.map((evt) => (
+                <div
+                  key={evt.id}
+                  style={{
+                    backgroundColor: '#1f2937',
+                    padding: '1rem',
+                    borderRadius: '6px',
+                    border: '1px solid #374151',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                    <strong style={{ color: '#60a5fa' }}>{evt.userName}</strong>
+                    <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>{formatTimeAgo(evt.createdAt)}</span>
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: '#d1d5db', marginBottom: '0.4rem' }}>
+                    <strong>Title:</strong> {evt.title}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: '#9ca3af', backgroundColor: '#111827', padding: '0.5rem', borderRadius: '4px', fontStyle: 'italic' }}>
+                    "{evt.content ? (evt.content.length > 150 ? `${evt.content.substring(0, 150)}...` : evt.content) : 'Empty content'}"
+                  </div>
+                </div>
+              ))}
+
+              {hasMoreHistory && (
+                <button
+                  onClick={handleLoadMoreHistory}
+                  className="btn btn-secondary"
+                  style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
+                  disabled={historyLoading}
+                >
+                  {historyLoading ? 'Loading...' : 'Load More History'}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 

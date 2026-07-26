@@ -50,6 +50,27 @@ export interface Collaborator {
   role: Role;
 }
 
+export interface EditEventItem {
+  id: string;
+  documentId: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  title: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface HistoryResponse {
+  events: EditEventItem[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export interface CreateDocumentPayload {
   title: string;
 }
