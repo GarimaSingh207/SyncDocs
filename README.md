@@ -28,12 +28,21 @@ SyncDocs/
 ├── frontend/         # React SPA frontend (Vite + TypeScript)
 │   ├── src/
 │   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── types/
-│   │   ├── hooks/
+│   │   │   ├── Navbar.tsx
+│   │   │   └── ProtectedRoute.tsx
 │   │   ├── context/
-│   │   └── assets/
+│   │   │   └── AuthContext.tsx
+│   │   ├── hooks/
+│   │   │   └── useAuth.ts
+│   │   ├── pages/
+│   │   │   ├── DashboardPage.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   └── RegisterPage.tsx
+│   │   ├── services/
+│   │   │   ├── api.ts
+│   │   │   └── auth.ts
+│   │   └── types/
+│   │       └── index.ts
 │   └── .env.example
 └── README.md
 ```
@@ -57,16 +66,16 @@ SyncDocs/
 
 ## Frontend Routes
 
-- `/` — Redirects to `/login`
-- `/login` — Login Page placeholder
-- `/register` — Register Page placeholder
-- `/dashboard` — Dashboard Page placeholder
-- `/documents` — Documents List Page placeholder
-- `/documents/:id` — Document Editor Page placeholder
+- `/` — Redirects to `/dashboard` if logged in, else `/login`
+- `/login` — Login Page with validation & error handling
+- `/register` — Registration Page with validation & error handling
+- `/dashboard` — Protected Dashboard showing authenticated user profile details
+- `/documents` — Protected Documents List Page placeholder
+- `/documents/:id` — Protected Document Editor Page placeholder
 
 ## Features
 
-- **Authentication**: User Registration & Login with JWT & bcrypt
+- **Authentication**: User Registration & Login with JWT & bcrypt (persisted via `localStorage` with `AuthContext` and `ProtectedRoute` wrappers)
 - **Document Management**: Create, Rename, Delete, List owned and shared documents
 - **Document Sharing**: Invite users by email with roles (OWNER, EDITOR, VIEWER)
 - **Access Control**: Enforced permissions on REST APIs and Socket.IO events
