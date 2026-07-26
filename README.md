@@ -11,7 +11,15 @@ SyncDocs/
 │   │   └── schema.prisma
 │   ├── src/
 │   │   ├── controllers/
+│   │   │   ├── auth.controller.ts
+│   │   │   └── health.controller.ts
+│   │   ├── middleware/
+│   │   │   └── auth.middleware.ts
 │   │   ├── routes/
+│   │   │   ├── auth.routes.ts
+│   │   │   └── health.routes.ts
+│   │   ├── schemas/
+│   │   │   └── auth.schema.ts
 │   │   ├── lib/
 │   │   │   └── prisma.ts
 │   │   ├── app.ts
@@ -41,6 +49,11 @@ SyncDocs/
 
 ### Health Check
 - `GET /api/health` — Returns status of backend server
+
+### Authentication
+- `POST /api/auth/register` — Register a new user (`name`, `email`, `password`)
+- `POST /api/auth/login` — Authenticate user and receive JWT token (`email`, `password`)
+- `GET /api/profile` — Get authenticated user profile (`Authorization: Bearer <token>`)
 
 ## Frontend Routes
 
