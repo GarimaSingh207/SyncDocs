@@ -160,6 +160,18 @@ export const updateDocument = async (req: Request, res: Response) => {
       data: validationResult.data,
     });
 
+    // Create immutable audit history log
+    await prisma.editEvent.create({
+      data: {
+        documentId: id,
+        userId: req.user.id,
+        changeSummary: JSON.stringify({
+          title: updatedDocument.title,
+          content: updatedDocument.content,
+        }),
+      },
+    });
+
     return res.status(200).json(updatedDocument);
   } catch (error) {
     console.error('Error updating document:', error);
