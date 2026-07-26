@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Document, Role, Collaborator } from '../types';
 import documentService from '../services/documents';
@@ -26,7 +26,18 @@ export const DocumentEditorPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
-  // Presence & Socket Room State
+  // Realtime Editing & Loop Prevention State
+  const [remoteNotice, setRemoteNotice] = useState<string | null>(null);
+  const isRemoteEditRef = useRef<boolean>(false);
+  const titleRef = useRef<string>('');
+  const contentRef = useRef<string>('');
+  const userRoleRef = useRef<Role>('VIEWER');
+
+  titleRef.current = title;
+  contentRef.current = content;
+  userRoleRef.current = userRole;
+
+  // Presence State
   const [activeRoomUsers, setActiveRoomUsers] = useState<RoomUser[]>([]);
 
   // Sharing state
@@ -66,16 +77,57 @@ export const DocumentEditorPage: React.FC = () => {
     fetchDocument();
   }, [id]);
 
-  // Socket Room & Realtime Presence Effect
+  // Socket Room & Collaborative Synchronization Effect
   useEffect(() => {
     if (!id || !socket || !connected || !document) return;
 
     // Join document room
     socket.emit('join-document', { documentId: id });
+    socket.emit('document-request-sync', { documentId: id });
 
     // Listen for presence updates
     const handleRoomUsers = (users: RoomUser[]) => {
       setActiveRoomUsers(users);
+    };
+
+    // Listen for remote document updates
+    const handleDocumentUpdate = (data: {
+      documentId: string;
+      title?: string;
+      content?: string;
+      updatedBy?: string;
+    }) => {
+      if (data.documentId !== id) return;
+
+      isRemoteEditRef.current = true;
+      if (data.title !== undefined) {
+        setTitle(data.title);
+      }
+      if (data.content !== undefined) {
+        setContent(data.content);
+      }
+
+      const updaterName = data.updatedBy ? `by ${data.updatedBy}` : '';
+      setRemoteNotice(`Document updated ${updaterName}`);
+      setTimeout(() => setRemoteNotice(null), 3000);
+    };
+
+    // Listen for sync request from late joiners
+    const handleRequestSync = (data: { requesterSocketId: string }) => {
+      if (userRoleRef.current === 'OWNER' || userRoleRef.current === 'EDITOR') {
+        socket.emit('document-sync', {
+          targetSocketId: data.requesterSocketId,
+          title: titleRef.current,
+          content: contentRef.current,
+        });
+      }
+    };
+
+    // Listen for direct sync payload
+    const handleDocumentSync = (data: { title: string; content: string }) => {
+      isRemoteEditRef.current = true;
+      setTitle(data.title);
+      setContent(data.content);
     };
 
     const handleSocketError = (err: { message: string }) => {
@@ -83,14 +135,54 @@ export const DocumentEditorPage: React.FC = () => {
     };
 
     socket.on('room-users', handleRoomUsers);
+    socket.on('document-update', handleDocumentUpdate);
+    socket.on('document-request-sync', handleRequestSync);
+    socket.on('document-sync', handleDocumentSync);
     socket.on('error', handleSocketError);
 
     return () => {
       socket.emit('leave-document', { documentId: id });
       socket.off('room-users', handleRoomUsers);
+      socket.off('document-update', handleDocumentUpdate);
+      socket.off('document-request-sync', handleRequestSync);
+      socket.off('document-sync', handleDocumentSync);
       socket.off('error', handleSocketError);
     };
   }, [id, socket, connected, document]);
+
+  // Handle Title Change (Local input)
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+
+    if (userRole === 'VIEWER') return;
+
+    if (!isRemoteEditRef.current && socket && connected && id) {
+      socket.emit('document-update', {
+        documentId: id,
+        title: newTitle,
+        content,
+      });
+    }
+    isRemoteEditRef.current = false;
+  };
+
+  // Handle Content Change (Local input)
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = e.target.value;
+    setContent(newContent);
+
+    if (userRole === 'VIEWER') return;
+
+    if (!isRemoteEditRef.current && socket && connected && id) {
+      socket.emit('document-update', {
+        documentId: id,
+        title,
+        content: newContent,
+      });
+    }
+    isRemoteEditRef.current = false;
+  };
 
   const loadCollaborators = async () => {
     if (!id || userRole !== 'OWNER') return;
@@ -225,7 +317,7 @@ export const DocumentEditorPage: React.FC = () => {
         <div className="editor-actions">
           {/* Socket Connection Badge */}
           <span className="socket-status-badge">
-            {connected ? '🟢 Connected' : connecting ? '🟡 Connecting...' : '🔴 Disconnected'}
+            {connected ? '● Live' : connecting ? '🟡 Connecting...' : '🔴 Disconnected'}
           </span>
 
           <span className={`role-badge role-${userRole.toLowerCase()}`}>{userRole}</span>
@@ -252,8 +344,35 @@ export const DocumentEditorPage: React.FC = () => {
 
       {error && <div className="alert alert-error">{error}</div>}
 
+      {/* Remote Edit Toast Banner */}
+      {remoteNotice && (
+        <div
+          className="alert"
+          style={{
+            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+            border: '1px solid #10b981',
+            color: '#6ee7b7',
+            transition: 'all 0.3s ease',
+          }}
+        >
+          ⚡ {remoteNotice}
+        </div>
+      )}
+
       {/* Realtime Active Presence Section */}
-      <div className="presence-bar" style={{ backgroundColor: '#111827', padding: '0.6rem 1rem', borderRadius: '6px', border: '1px solid #374151', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div
+        className="presence-bar"
+        style={{
+          backgroundColor: '#111827',
+          padding: '0.6rem 1rem',
+          borderRadius: '6px',
+          border: '1px solid #374151',
+          marginBottom: '1.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+        }}
+      >
         <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#9ca3af' }}>Currently viewing:</span>
         {activeRoomUsers.length === 0 ? (
           <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>Only you</span>
@@ -269,18 +388,45 @@ export const DocumentEditorPage: React.FC = () => {
       </div>
 
       {isReadOnly && (
-        <div className="alert" style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', border: '1px solid #3b82f6', color: '#93c5fd' }}>
+        <div
+          className="alert"
+          style={{
+            backgroundColor: 'rgba(59, 130, 246, 0.15)',
+            border: '1px solid #3b82f6',
+            color: '#93c5fd',
+          }}
+        >
           ℹ You have read-only (Viewer) access to this document.
         </div>
       )}
 
       {/* Share / Collaborators Panel */}
       {showShareModal && userRole === 'OWNER' && (
-        <div className="share-panel" style={{ backgroundColor: '#111827', padding: '1.5rem', borderRadius: '8px', border: '1px solid #374151', marginBottom: '1.5rem' }}>
+        <div
+          className="share-panel"
+          style={{
+            backgroundColor: '#111827',
+            padding: '1.5rem',
+            borderRadius: '8px',
+            border: '1px solid #374151',
+            marginBottom: '1.5rem',
+          }}
+        >
           <h3 style={{ marginTop: 0, color: '#f3f4f6' }}>Manage Collaborators</h3>
 
           {shareError && <div className="alert alert-error">{shareError}</div>}
-          {shareSuccess && <div className="alert" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7' }}>{shareSuccess}</div>}
+          {shareSuccess && (
+            <div
+              className="alert"
+              style={{
+                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid #10b981',
+                color: '#6ee7b7',
+              }}
+            >
+              {shareSuccess}
+            </div>
+          )}
 
           <form onSubmit={handleShareUser} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
             <input
@@ -289,13 +435,26 @@ export const DocumentEditorPage: React.FC = () => {
               value={shareEmail}
               onChange={(e) => setShareEmail(e.target.value)}
               required
-              style={{ flex: 1, padding: '0.6rem 0.8rem', backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '6px', color: '#fff' }}
+              style={{
+                flex: 1,
+                padding: '0.6rem 0.8rem',
+                backgroundColor: '#1f2937',
+                border: '1px solid #374151',
+                borderRadius: '6px',
+                color: '#fff',
+              }}
               disabled={shareLoading}
             />
             <select
               value={shareRole}
               onChange={(e) => setShareRole(e.target.value as Role)}
-              style={{ padding: '0.6rem 0.8rem', backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '6px', color: '#fff' }}
+              style={{
+                padding: '0.6rem 0.8rem',
+                backgroundColor: '#1f2937',
+                border: '1px solid #374151',
+                borderRadius: '6px',
+                color: '#fff',
+              }}
               disabled={shareLoading}
             >
               <option value="VIEWER">Viewer</option>
@@ -312,15 +471,34 @@ export const DocumentEditorPage: React.FC = () => {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {collaborators.map((c) => (
-                <div key={c.accessId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1f2937', padding: '0.75rem 1rem', borderRadius: '6px', border: '1px solid #374151' }}>
+                <div
+                  key={c.accessId}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    backgroundColor: '#1f2937',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '6px',
+                    border: '1px solid #374151',
+                  }}
+                >
                   <div>
-                    <strong style={{ color: '#f9fafb' }}>{c.name}</strong> <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>({c.email})</span>
+                    <strong style={{ color: '#f9fafb' }}>{c.name}</strong>{' '}
+                    <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>({c.email})</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <select
                       value={c.role}
                       onChange={(e) => handleUpdateRole(c.accessId, e.target.value as Role)}
-                      style={{ padding: '0.4rem 0.6rem', backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '4px', color: '#fff', fontSize: '0.85rem' }}
+                      style={{
+                        padding: '0.4rem 0.6rem',
+                        backgroundColor: '#111827',
+                        border: '1px solid #374151',
+                        borderRadius: '4px',
+                        color: '#fff',
+                        fontSize: '0.85rem',
+                      }}
                     >
                       <option value="VIEWER">Viewer</option>
                       <option value="EDITOR">Editor</option>
@@ -345,7 +523,7 @@ export const DocumentEditorPage: React.FC = () => {
           type="text"
           className="editor-title-input"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={handleTitleChange}
           placeholder="Document Title"
           disabled={saving || isReadOnly}
         />
@@ -355,8 +533,10 @@ export const DocumentEditorPage: React.FC = () => {
         <textarea
           className="editor-textarea"
           value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder={isReadOnly ? 'Read-only document content.' : 'Start typing your document content here...'}
+          onChange={handleContentChange}
+          placeholder={
+            isReadOnly ? 'Read-only document content.' : 'Start typing your document content here...'
+          }
           disabled={saving || isReadOnly}
         />
       </div>
