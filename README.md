@@ -108,6 +108,16 @@ Every incoming socket connection must present a valid JWT token via `socket.hand
 - `document-sync` — Emitted by existing connected editors responding to a state sync request.
 - `error` — Emitted to client when an unauthorized action or room join attempt is made.
 
+## Auto-Save & Persistence Architecture
+- **Debounced Save (800ms)**: Automatically persists changes to PostgreSQL after 800ms of user inactivity. Keystrokes reset the timer to prevent unnecessary REST requests.
+- **Save Status Lifecycle**:
+  - `saved`: `✓ Saved`
+  - `saving`: `● Saving...`
+  - `unsaved`: `● Unsaved`
+  - `error`: `⚠ Save failed`
+- **Remote Edit Isolation**: Incoming socket updates update in-memory state and baseline refs without scheduling REST auto-save calls.
+- **Unmount Flush**: Pending unsaved edits are flushed immediately to the backend when navigating away or unmounting.
+
 ## Frontend Routes
 
 - `/` — Redirects to `/dashboard` if logged in, else `/login`
@@ -115,7 +125,7 @@ Every incoming socket connection must present a valid JWT token via `socket.hand
 - `/register` — Registration Page with validation & error handling
 - `/dashboard` — Protected Dashboard with total document statistics and top 5 recent documents
 - `/documents` — Protected Documents List Page featuring "My Documents" and "Shared With Me" sections
-- `/documents/:id` — Protected Document Editor Page featuring realtime collaborative synchronization, Last Write Wins (LWW) conflict handling, loop prevention refs, live connection indicator (`● Live`), presence bar, and remote edit notifications
+- `/documents/:id` — Protected Document Editor Page featuring debounced auto-save, save status lifecycle indicators, realtime collaborative synchronization, Last Write Wins (LWW) conflict handling, live connection indicator (`● Live`), and presence bar
 
 ## Features
 
@@ -125,4 +135,4 @@ Every incoming socket connection must present a valid JWT token via `socket.hand
 - **Access Control**: Enforced permissions on REST APIs (Owner = Full, Editor = Read/Edit, Viewer = Read Only)
 - **Socket.IO Foundation**: Authenticated websockets, room isolation (`document:<id>`), and active user presence tracking
 - **Realtime Editing**: Collaborative editing using Socket.IO room broadcast with Last Write Wins (LWW) resolution and infinite loop prevention
-- **Persistence & History**: Debounced PostgreSQL saves and edit event logging
+- **Debounced Auto-Save**: Seamless 800ms background persistence to PostgreSQL with unmount flushing and status indicators
