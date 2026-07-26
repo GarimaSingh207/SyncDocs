@@ -103,7 +103,10 @@ Every incoming socket connection must present a valid JWT token via `socket.hand
 - `join-document` — Sent by client with `{ documentId }`. Verifies document access (OWNER, EDITOR, VIEWER) before joining room `document:<documentId>`.
 - `leave-document` — Sent by client with `{ documentId }`. Leaves room `document:<documentId>`.
 - `room-users` — Broadcast by server to room `document:<documentId>` whenever active presence changes. Transmits active users list `[{ userId, name, role }]`.
-- `error` — Emitted to client when an unauthorized room join attempt is made.
+- `document-update` — Emitted by `OWNER` or `EDITOR` with `{ documentId, title, content }`. Server broadcasts payload to all other room occupants (`socket.to(room).emit(...)`). Viewers attempting to emit receive an `error` event.
+- `document-request-sync` — Emitted by newly joined clients to request current state.
+- `document-sync` — Emitted by existing connected editors responding to a state sync request.
+- `error` — Emitted to client when an unauthorized action or room join attempt is made.
 
 ## Frontend Routes
 
@@ -112,7 +115,7 @@ Every incoming socket connection must present a valid JWT token via `socket.hand
 - `/register` — Registration Page with validation & error handling
 - `/dashboard` — Protected Dashboard with total document statistics and top 5 recent documents
 - `/documents` — Protected Documents List Page featuring "My Documents" and "Shared With Me" sections
-- `/documents/:id` — Protected Document Editor Page displaying realtime connection status badge, active room presence bar, role badge, Viewer read-only restrictions, and Owner collaborator management
+- `/documents/:id` — Protected Document Editor Page featuring realtime collaborative synchronization, Last Write Wins (LWW) conflict handling, loop prevention refs, live connection indicator (`● Live`), presence bar, and remote edit notifications
 
 ## Features
 
@@ -121,5 +124,5 @@ Every incoming socket connection must present a valid JWT token via `socket.hand
 - **Document Sharing**: Invite users by email with roles (`OWNER`, `EDITOR`, `VIEWER`), update roles, or revoke access
 - **Access Control**: Enforced permissions on REST APIs (Owner = Full, Editor = Read/Edit, Viewer = Read Only)
 - **Socket.IO Foundation**: Authenticated websockets, room isolation (`document:<id>`), and active user presence tracking
-- **Realtime Editing**: Collaborative editing using Socket.IO room broadcast
+- **Realtime Editing**: Collaborative editing using Socket.IO room broadcast with Last Write Wins (LWW) resolution and infinite loop prevention
 - **Persistence & History**: Debounced PostgreSQL saves and edit event logging
