@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import { createDocumentSchema, updateDocumentSchema } from '../schemas/document.schema';
+import { Role } from '@prisma/client';
 
 export const getDocuments = async (req: Request, res: Response) => {
   try {
@@ -48,7 +49,10 @@ export const createDocument = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(201).json(document);
+    return res.status(201).json({
+      ...document,
+      userRole: Role.OWNER,
+    });
   } catch (error) {
     console.error('Error creating document:', error);
     return res.status(500).json({ message: 'Internal server error' });
@@ -71,11 +75,33 @@ export const getDocumentById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Document not found' });
     }
 
-    if (document.ownerId !== req.user.id) {
-      return res.status(403).json({ message: 'Access denied. You do not own this document.' });
+    let userRole: Role | null = null;
+
+    if (document.ownerId === req.user.id) {
+      userRole = Role.OWNER;
+    } else {
+      const access = await prisma.documentAccess.findUnique({
+        where: {
+          documentId_userId: {
+            documentId: id,
+            userId: req.user.id,
+          },
+        },
+      });
+
+      if (access) {
+        userRole = access.role;
+      }
     }
 
-    return res.status(200).json(document);
+    if (!userRole) {
+      return res.status(403).json({ message: 'Access denied. You do not have permission to view this document.' });
+    }
+
+    return res.status(200).json({
+      ...document,
+      userRole,
+    });
   } catch (error) {
     console.error('Error fetching document by ID:', error);
     return res.status(500).json({ message: 'Internal server error' });
@@ -106,8 +132,27 @@ export const updateDocument = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Document not found' });
     }
 
-    if (existingDocument.ownerId !== req.user.id) {
-      return res.status(403).json({ message: 'Access denied. You do not own this document.' });
+    let canEdit = false;
+
+    if (existingDocument.ownerId === req.user.id) {
+      canEdit = true;
+    } else {
+      const access = await prisma.documentAccess.findUnique({
+        where: {
+          documentId_userId: {
+            documentId: id,
+            userId: req.user.id,
+          },
+        },
+      });
+
+      if (access && access.role === Role.EDITOR) {
+        canEdit = true;
+      }
+    }
+
+    if (!canEdit) {
+      return res.status(403).json({ message: 'Access denied. Viewers cannot edit documents.' });
     }
 
     const updatedDocument = await prisma.document.update({
@@ -139,7 +184,7 @@ export const deleteDocument = async (req: Request, res: Response) => {
     }
 
     if (existingDocument.ownerId !== req.user.id) {
-      return res.status(403).json({ message: 'Access denied. You do not own this document.' });
+      return res.status(403).json({ message: 'Access denied. Only the document owner can delete this document.' });
     }
 
     await prisma.document.delete({
