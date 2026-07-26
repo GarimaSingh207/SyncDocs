@@ -13,7 +13,16 @@ SyncDocs/
 │   │   ├── app.ts
 │   │   └── index.ts
 │   └── .env.example
-├── frontend/         # React SPA frontend
+├── frontend/         # React SPA frontend (Vite + TypeScript)
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── types/
+│   │   ├── hooks/
+│   │   ├── context/
+│   │   └── assets/
+│   └── .env.example
 └── README.md
 ```
 
@@ -21,6 +30,15 @@ SyncDocs/
 
 ### Health Check
 - `GET /api/health` — Returns status of backend server
+
+## Frontend Routes
+
+- `/` — Redirects to `/login`
+- `/login` — Login Page placeholder
+- `/register` — Register Page placeholder
+- `/dashboard` — Dashboard Page placeholder
+- `/documents` — Documents List Page placeholder
+- `/documents/:id` — Document Editor Page placeholder
 
 ## Features
 
