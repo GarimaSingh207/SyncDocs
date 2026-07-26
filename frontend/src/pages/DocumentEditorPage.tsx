@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Document, Role, Collaborator } from '../types';
 import documentService from '../services/documents';
@@ -12,6 +12,8 @@ interface RoomUser {
   role: Role;
 }
 
+type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';
+
 export const DocumentEditorPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -22,20 +24,25 @@ export const DocumentEditorPage: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState<boolean>(true);
-  const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
-  // Realtime Editing & Loop Prevention State
+  // Auto-Save & Debounce State
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
+  const lastSavedRef = useRef<{ title: string; content: string }>({ title: '', content: '' });
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Realtime Editing & Loop Prevention Refs
   const [remoteNotice, setRemoteNotice] = useState<string | null>(null);
   const isRemoteEditRef = useRef<boolean>(false);
   const titleRef = useRef<string>('');
   const contentRef = useRef<string>('');
   const userRoleRef = useRef<Role>('VIEWER');
+  const saveStatusRef = useRef<SaveStatus>('saved');
 
   titleRef.current = title;
   contentRef.current = content;
   userRoleRef.current = userRole;
+  saveStatusRef.current = saveStatus;
 
   // Presence State
   const [activeRoomUsers, setActiveRoomUsers] = useState<RoomUser[]>([]);
@@ -49,6 +56,62 @@ export const DocumentEditorPage: React.FC = () => {
   const [shareError, setShareError] = useState<string | null>(null);
   const [shareSuccess, setShareSuccess] = useState<string | null>(null);
 
+  // Execute Persistence Request to Backend
+  const performSave = useCallback(
+    async (titleToSave: string, contentToSave: string) => {
+      if (!id || !titleToSave.trim() || userRoleRef.current === 'VIEWER') return;
+
+      if (
+        titleToSave === lastSavedRef.current.title &&
+        contentToSave === lastSavedRef.current.content
+      ) {
+        setSaveStatus('saved');
+        return;
+      }
+
+      setSaveStatus('saving');
+      try {
+        const updated = await documentService.updateDocument(id, {
+          title: titleToSave.trim(),
+          content: contentToSave,
+        });
+        lastSavedRef.current = { title: updated.title, content: updated.content };
+        setSaveStatus('saved');
+      } catch (err) {
+        console.error('Auto-save failed:', err);
+        setSaveStatus('error');
+      }
+    },
+    [id]
+  );
+
+  // Schedule Debounced Auto-Save (800ms)
+  const scheduleAutoSave = useCallback(
+    (newTitle: string, newContent: string) => {
+      if (userRoleRef.current === 'VIEWER') return;
+
+      if (
+        newTitle === lastSavedRef.current.title &&
+        newContent === lastSavedRef.current.content
+      ) {
+        setSaveStatus('saved');
+        return;
+      }
+
+      setSaveStatus('unsaved');
+
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      debounceTimerRef.current = setTimeout(() => {
+        performSave(newTitle, newContent);
+      }, 800);
+    },
+    [performSave]
+  );
+
+  // Fetch initial document
   useEffect(() => {
     if (!id) return;
 
@@ -60,6 +123,7 @@ export const DocumentEditorPage: React.FC = () => {
         setDocument(doc);
         setTitle(doc.title);
         setContent(doc.content);
+        lastSavedRef.current = { title: doc.title, content: doc.content };
         if (doc.userRole) {
           setUserRole(doc.userRole);
         }
@@ -75,6 +139,26 @@ export const DocumentEditorPage: React.FC = () => {
     };
 
     fetchDocument();
+  }, [id]);
+
+  // Flush unsaved changes on unmount / navigation
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      if (
+        saveStatusRef.current === 'unsaved' &&
+        userRoleRef.current !== 'VIEWER' &&
+        id &&
+        titleRef.current.trim()
+      ) {
+        documentService.updateDocument(id, {
+          title: titleRef.current.trim(),
+          content: contentRef.current,
+        }).catch((e) => console.error('Unmount save failed:', e));
+      }
+    };
   }, [id]);
 
   // Socket Room & Collaborative Synchronization Effect
@@ -102,10 +186,17 @@ export const DocumentEditorPage: React.FC = () => {
       isRemoteEditRef.current = true;
       if (data.title !== undefined) {
         setTitle(data.title);
+        lastSavedRef.current.title = data.title;
       }
       if (data.content !== undefined) {
         setContent(data.content);
+        lastSavedRef.current.content = data.content;
       }
+
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      setSaveStatus('saved');
 
       const updaterName = data.updatedBy ? `by ${data.updatedBy}` : '';
       setRemoteNotice(`Document updated ${updaterName}`);
@@ -128,6 +219,11 @@ export const DocumentEditorPage: React.FC = () => {
       isRemoteEditRef.current = true;
       setTitle(data.title);
       setContent(data.content);
+      lastSavedRef.current = { title: data.title, content: data.content };
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      setSaveStatus('saved');
     };
 
     const handleSocketError = (err: { message: string }) => {
@@ -157,12 +253,15 @@ export const DocumentEditorPage: React.FC = () => {
 
     if (userRole === 'VIEWER') return;
 
-    if (!isRemoteEditRef.current && socket && connected && id) {
-      socket.emit('document-update', {
-        documentId: id,
-        title: newTitle,
-        content,
-      });
+    if (!isRemoteEditRef.current) {
+      if (socket && connected && id) {
+        socket.emit('document-update', {
+          documentId: id,
+          title: newTitle,
+          content,
+        });
+      }
+      scheduleAutoSave(newTitle, content);
     }
     isRemoteEditRef.current = false;
   };
@@ -174,12 +273,15 @@ export const DocumentEditorPage: React.FC = () => {
 
     if (userRole === 'VIEWER') return;
 
-    if (!isRemoteEditRef.current && socket && connected && id) {
-      socket.emit('document-update', {
-        documentId: id,
-        title,
-        content: newContent,
-      });
+    if (!isRemoteEditRef.current) {
+      if (socket && connected && id) {
+        socket.emit('document-update', {
+          documentId: id,
+          title,
+          content: newContent,
+        });
+      }
+      scheduleAutoSave(title, newContent);
     }
     isRemoteEditRef.current = false;
   };
@@ -198,34 +300,6 @@ export const DocumentEditorPage: React.FC = () => {
     setShowShareModal(!showShareModal);
     if (!showShareModal) {
       loadCollaborators();
-    }
-  };
-
-  const handleSave = async () => {
-    if (!id || !title.trim() || userRole === 'VIEWER') return;
-
-    setSaving(true);
-    setError(null);
-    setSaveSuccess(false);
-
-    try {
-      const updated = await documentService.updateDocument(id, {
-        title: title.trim(),
-        content,
-      });
-      setDocument(updated);
-      setTitle(updated.title);
-      setContent(updated.content);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError('Failed to save document.');
-      }
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -328,16 +402,14 @@ export const DocumentEditorPage: React.FC = () => {
             </button>
           )}
 
-          {saveSuccess && <span className="save-status">✓ Saved</span>}
-
+          {/* Auto-Save Status Indicator */}
           {!isReadOnly && (
-            <button
-              onClick={handleSave}
-              className="btn btn-primary"
-              disabled={saving || !title.trim()}
-            >
-              {saving ? 'Saving...' : 'Save Document'}
-            </button>
+            <span className={`save-status save-${saveStatus}`}>
+              {saveStatus === 'saving' && '● Saving...'}
+              {saveStatus === 'saved' && '✓ Saved'}
+              {saveStatus === 'unsaved' && '● Unsaved'}
+              {saveStatus === 'error' && '⚠ Save failed'}
+            </span>
           )}
         </div>
       </div>
@@ -525,7 +597,7 @@ export const DocumentEditorPage: React.FC = () => {
           value={title}
           onChange={handleTitleChange}
           placeholder="Document Title"
-          disabled={saving || isReadOnly}
+          disabled={isReadOnly}
         />
       </div>
 
@@ -537,7 +609,7 @@ export const DocumentEditorPage: React.FC = () => {
           placeholder={
             isReadOnly ? 'Read-only document content.' : 'Start typing your document content here...'
           }
-          disabled={saving || isReadOnly}
+          disabled={isReadOnly}
         />
       </div>
     </div>
