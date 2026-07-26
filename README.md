@@ -26,6 +26,9 @@ SyncDocs/
 │   │   │   ├── auth.schema.ts
 │   │   │   ├── document.schema.ts
 │   │   │   └── sharing.schema.ts
+│   │   ├── socket/
+│   │   │   ├── events.ts
+│   │   │   └── index.ts
 │   │   ├── lib/
 │   │   │   └── prisma.ts
 │   │   ├── app.ts
@@ -37,9 +40,11 @@ SyncDocs/
 │   │   │   ├── Navbar.tsx
 │   │   │   └── ProtectedRoute.tsx
 │   │   ├── context/
-│   │   │   └── AuthContext.tsx
+│   │   │   ├── AuthContext.tsx
+│   │   │   └── SocketContext.tsx
 │   │   ├── hooks/
-│   │   │   └── useAuth.ts
+│   │   │   ├── useAuth.ts
+│   │   │   └── useSocket.ts
 │   │   ├── pages/
 │   │   │   ├── DashboardPage.tsx
 │   │   │   ├── DocumentEditorPage.tsx
@@ -50,7 +55,8 @@ SyncDocs/
 │   │   │   ├── api.ts
 │   │   │   ├── auth.ts
 │   │   │   ├── documents.ts
-│   │   │   └── sharing.ts
+│   │   │   ├── sharing.ts
+│   │   │   └── socket.ts
 │   │   └── types/
 │   │       └── index.ts
 │   └── .env.example
@@ -88,6 +94,17 @@ SyncDocs/
 - `PATCH /api/documents/:id/access/:accessId` — Update collaborator role (`EDITOR` / `VIEWER`)
 - `DELETE /api/documents/:id/access/:accessId` — Revoke collaborator access
 
+## Socket.IO Events & Realtime Architecture
+
+### Socket Authentication
+Every incoming socket connection must present a valid JWT token via `socket.handshake.auth.token`. Missing or invalid tokens result in connection rejection (`connect_error`).
+
+### Realtime Events
+- `join-document` — Sent by client with `{ documentId }`. Verifies document access (OWNER, EDITOR, VIEWER) before joining room `document:<documentId>`.
+- `leave-document` — Sent by client with `{ documentId }`. Leaves room `document:<documentId>`.
+- `room-users` — Broadcast by server to room `document:<documentId>` whenever active presence changes. Transmits active users list `[{ userId, name, role }]`.
+- `error` — Emitted to client when an unauthorized room join attempt is made.
+
 ## Frontend Routes
 
 - `/` — Redirects to `/dashboard` if logged in, else `/login`
@@ -95,7 +112,7 @@ SyncDocs/
 - `/register` — Registration Page with validation & error handling
 - `/dashboard` — Protected Dashboard with total document statistics and top 5 recent documents
 - `/documents` — Protected Documents List Page featuring "My Documents" and "Shared With Me" sections
-- `/documents/:id` — Protected Document Editor Page displaying role badge, enforcing Viewer read-only restrictions, and providing Owner collaborator management
+- `/documents/:id` — Protected Document Editor Page displaying realtime connection status badge, active room presence bar, role badge, Viewer read-only restrictions, and Owner collaborator management
 
 ## Features
 
@@ -103,5 +120,6 @@ SyncDocs/
 - **Document Management**: Create, Rename, Delete, List owned documents with owner authorization
 - **Document Sharing**: Invite users by email with roles (`OWNER`, `EDITOR`, `VIEWER`), update roles, or revoke access
 - **Access Control**: Enforced permissions on REST APIs (Owner = Full, Editor = Read/Edit, Viewer = Read Only)
+- **Socket.IO Foundation**: Authenticated websockets, room isolation (`document:<id>`), and active user presence tracking
 - **Realtime Editing**: Collaborative editing using Socket.IO room broadcast
 - **Persistence & History**: Debounced PostgreSQL saves and edit event logging
