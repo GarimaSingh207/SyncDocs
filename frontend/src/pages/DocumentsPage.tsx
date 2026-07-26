@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Document } from '../types';
+import type { Document, SharedDocument } from '../types';
 import documentService from '../services/documents';
+import sharingService from '../services/sharing';
 import axios from 'axios';
 
 export const DocumentsPage: React.FC = () => {
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const [myDocuments, setMyDocuments] = useState<Document[]>([]);
+  const [sharedDocuments, setSharedDocuments] = useState<SharedDocument[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState('');
@@ -13,12 +15,16 @@ export const DocumentsPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const fetchDocuments = async () => {
+  const fetchAllDocuments = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await documentService.getDocuments();
-      setDocuments(data);
+      const [owned, shared] = await Promise.all([
+        documentService.getDocuments(),
+        sharingService.getSharedDocuments(),
+      ]);
+      setMyDocuments(owned);
+      setSharedDocuments(shared);
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response?.data?.message) {
         setError(err.response.data.message);
@@ -31,7 +37,7 @@ export const DocumentsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchDocuments();
+    fetchAllDocuments();
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -43,7 +49,7 @@ export const DocumentsPage: React.FC = () => {
     try {
       const created = await documentService.createDocument({ title: newTitle.trim() });
       setNewTitle('');
-      setDocuments((prev) => [created, ...prev]);
+      setMyDocuments((prev) => [created, ...prev]);
       navigate(`/documents/${created.id}`);
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response?.data?.message) {
@@ -63,7 +69,7 @@ export const DocumentsPage: React.FC = () => {
 
     try {
       await documentService.deleteDocument(id);
-      setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+      setMyDocuments((prev) => prev.filter((doc) => doc.id !== id));
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response?.data?.message) {
         setError(err.response.data.message);
@@ -76,7 +82,7 @@ export const DocumentsPage: React.FC = () => {
   return (
     <div className="page-container">
       <div className="documents-header">
-        <h2>My Documents</h2>
+        <h2>Documents Overview</h2>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
@@ -86,7 +92,7 @@ export const DocumentsPage: React.FC = () => {
           type="text"
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Enter document title..."
+          placeholder="Enter new document title..."
           disabled={isCreating}
           required
         />
@@ -99,37 +105,78 @@ export const DocumentsPage: React.FC = () => {
         <div style={{ textAlign: 'center', padding: '2rem' }}>
           <p>Loading documents...</p>
         </div>
-      ) : documents.length === 0 ? (
-        <div className="empty-state">
-          <p>No documents found. Create your first document above!</p>
-        </div>
       ) : (
-        <div className="documents-list">
-          {documents.map((doc) => (
-            <div key={doc.id} className="document-card">
-              <div className="document-info">
-                <h3>{doc.title}</h3>
-                <span className="document-date">
-                  Updated: {new Date(doc.updatedAt).toLocaleString()}
-                </span>
+        <>
+          {/* Section 1: My Documents */}
+          <div className="documents-section" style={{ marginBottom: '2.5rem' }}>
+            <h3 style={{ borderBottom: '1px solid #374151', paddingBottom: '0.5rem', color: '#f3f4f6' }}>
+              My Documents ({myDocuments.length})
+            </h3>
+            {myDocuments.length === 0 ? (
+              <p className="empty-state">No owned documents found. Create your first document above!</p>
+            ) : (
+              <div className="documents-list">
+                {myDocuments.map((doc) => (
+                  <div key={doc.id} className="document-card">
+                    <div className="document-info">
+                      <h3>{doc.title}</h3>
+                      <span className="document-date">
+                        Updated: {new Date(doc.updatedAt).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="document-actions">
+                      <span className="role-badge role-owner">Owner</span>
+                      <button
+                        onClick={() => navigate(`/documents/${doc.id}`)}
+                        className="btn btn-secondary"
+                      >
+                        Open
+                      </button>
+                      <button
+                        onClick={() => handleDelete(doc.id, doc.title)}
+                        className="btn btn-danger"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="document-actions">
-                <button
-                  onClick={() => navigate(`/documents/${doc.id}`)}
-                  className="btn btn-secondary"
-                >
-                  Open
-                </button>
-                <button
-                  onClick={() => handleDelete(doc.id, doc.title)}
-                  className="btn btn-danger"
-                >
-                  Delete
-                </button>
+            )}
+          </div>
+
+          {/* Section 2: Shared With Me */}
+          <div className="documents-section">
+            <h3 style={{ borderBottom: '1px solid #374151', paddingBottom: '0.5rem', color: '#f3f4f6' }}>
+              Shared With Me ({sharedDocuments.length})
+            </h3>
+            {sharedDocuments.length === 0 ? (
+              <p className="empty-state">No documents shared with you yet.</p>
+            ) : (
+              <div className="documents-list">
+                {sharedDocuments.map((doc) => (
+                  <div key={doc.id} className="document-card">
+                    <div className="document-info">
+                      <h3>{doc.title}</h3>
+                      <span className="document-date">
+                        Owner: {doc.owner?.name} ({doc.owner?.email}) • Updated: {new Date(doc.updatedAt).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="document-actions">
+                      <span className={`role-badge role-${doc.role.toLowerCase()}`}>{doc.role}</span>
+                      <button
+                        onClick={() => navigate(`/documents/${doc.id}`)}
+                        className="btn btn-secondary"
+                      >
+                        Open
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

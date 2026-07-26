@@ -1,3 +1,5 @@
+export type Role = 'OWNER' | 'EDITOR' | 'VIEWER';
+
 export interface User {
   id: string;
   name: string;
@@ -28,6 +30,24 @@ export interface Document {
   ownerId: string;
   createdAt: string;
   updatedAt: string;
+  userRole?: Role;
+  owner?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export interface SharedDocument extends Document {
+  role: Role;
+}
+
+export interface Collaborator {
+  accessId: string;
+  userId: string;
+  name: string;
+  email: string;
+  role: Role;
 }
 
 export interface CreateDocumentPayload {
@@ -37,4 +57,13 @@ export interface CreateDocumentPayload {
 export interface UpdateDocumentPayload {
   title?: string;
   content?: string;
+}
+
+export interface ShareDocumentPayload {
+  email: string;
+  role: Role;
+}
+
+export interface UpdateAccessRolePayload {
+  role: Role;
 }
