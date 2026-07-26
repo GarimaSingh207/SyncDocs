@@ -1,11 +1,9 @@
-import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const app = express();
+import app from './app';
+
 const PORT = process.env.PORT || 5000;
-
-app.get('/', (req, res) => {
-  res.json({ message: 'SyncDocs API' });
-});
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
