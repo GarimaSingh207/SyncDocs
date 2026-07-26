@@ -3,11 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import type { Document, Role, Collaborator } from '../types';
 import documentService from '../services/documents';
 import sharingService from '../services/sharing';
+import useSocket from '../hooks/useSocket';
 import axios from 'axios';
+
+interface RoomUser {
+  userId: string;
+  name: string;
+  role: Role;
+}
 
 export const DocumentEditorPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { socket, connected, connecting } = useSocket();
 
   const [document, setDocument] = useState<Document | null>(null);
   const [userRole, setUserRole] = useState<Role>('VIEWER');
@@ -17,6 +25,9 @@ export const DocumentEditorPage: React.FC = () => {
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+
+  // Presence & Socket Room State
+  const [activeRoomUsers, setActiveRoomUsers] = useState<RoomUser[]>([]);
 
   // Sharing state
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
@@ -54,6 +65,32 @@ export const DocumentEditorPage: React.FC = () => {
 
     fetchDocument();
   }, [id]);
+
+  // Socket Room & Realtime Presence Effect
+  useEffect(() => {
+    if (!id || !socket || !connected || !document) return;
+
+    // Join document room
+    socket.emit('join-document', { documentId: id });
+
+    // Listen for presence updates
+    const handleRoomUsers = (users: RoomUser[]) => {
+      setActiveRoomUsers(users);
+    };
+
+    const handleSocketError = (err: { message: string }) => {
+      setError(err.message || 'Realtime room connection error');
+    };
+
+    socket.on('room-users', handleRoomUsers);
+    socket.on('error', handleSocketError);
+
+    return () => {
+      socket.emit('leave-document', { documentId: id });
+      socket.off('room-users', handleRoomUsers);
+      socket.off('error', handleSocketError);
+    };
+  }, [id, socket, connected, document]);
 
   const loadCollaborators = async () => {
     if (!id || userRole !== 'OWNER') return;
@@ -186,6 +223,11 @@ export const DocumentEditorPage: React.FC = () => {
           ← Back to Documents
         </button>
         <div className="editor-actions">
+          {/* Socket Connection Badge */}
+          <span className="socket-status-badge">
+            {connected ? '🟢 Connected' : connecting ? '🟡 Connecting...' : '🔴 Disconnected'}
+          </span>
+
           <span className={`role-badge role-${userRole.toLowerCase()}`}>{userRole}</span>
 
           {userRole === 'OWNER' && (
@@ -209,6 +251,22 @@ export const DocumentEditorPage: React.FC = () => {
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
+
+      {/* Realtime Active Presence Section */}
+      <div className="presence-bar" style={{ backgroundColor: '#111827', padding: '0.6rem 1rem', borderRadius: '6px', border: '1px solid #374151', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#9ca3af' }}>Currently viewing:</span>
+        {activeRoomUsers.length === 0 ? (
+          <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>Only you</span>
+        ) : (
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {activeRoomUsers.map((u) => (
+              <span key={u.userId} className={`presence-pill presence-${u.role.toLowerCase()}`}>
+                {u.name} ({u.role})
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
 
       {isReadOnly && (
         <div className="alert" style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', border: '1px solid #3b82f6', color: '#93c5fd' }}>
