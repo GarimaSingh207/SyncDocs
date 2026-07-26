@@ -14,6 +14,7 @@ SyncDocs/
 │   │   │   ├── auth.controller.ts
 │   │   │   ├── document.controller.ts
 │   │   │   ├── health.controller.ts
+│   │   │   ├── history.controller.ts
 │   │   │   └── sharing.controller.ts
 │   │   ├── middleware/
 │   │   │   └── auth.middleware.ts
@@ -21,6 +22,7 @@ SyncDocs/
 │   │   │   ├── auth.routes.ts
 │   │   │   ├── document.routes.ts
 │   │   │   ├── health.routes.ts
+│   │   │   ├── history.routes.ts
 │   │   │   └── sharing.routes.ts
 │   │   ├── schemas/
 │   │   │   ├── auth.schema.ts
@@ -55,6 +57,7 @@ SyncDocs/
 │   │   │   ├── api.ts
 │   │   │   ├── auth.ts
 │   │   │   ├── documents.ts
+│   │   │   ├── history.ts
 │   │   │   ├── sharing.ts
 │   │   │   └── socket.ts
 │   │   └── types/
@@ -84,8 +87,11 @@ SyncDocs/
 - `GET /api/documents` — Get documents owned by authenticated user (ordered by `updatedAt` desc)
 - `POST /api/documents` — Create a new document (`title`)
 - `GET /api/documents/:id` — Get document details by ID (Accessible by `OWNER`, `EDITOR`, `VIEWER`)
-- `PATCH /api/documents/:id` — Update document title/content (Accessible by `OWNER` & `EDITOR`, `403` for `VIEWER`)
+- `PATCH /api/documents/:id` — Update document title/content (Accessible by `OWNER` & `EDITOR`, `403` for `VIEWER`). Automatically creates an immutable `EditEvent` log upon success.
 - `DELETE /api/documents/:id` — Delete document by ID (`OWNER` only)
+
+### Document Edit History & Audit Logging
+- `GET /api/documents/:id/history` — Get paginated edit audit history for document (`page`, `limit`). Accessible by `OWNER`, `EDITOR`, `VIEWER`. Returns events ordered newest first with editor details and title/content snapshots.
 
 ### Sharing & Collaborator Management (Owner Only)
 - `GET /api/documents/shared` — Get documents shared with authenticated user
@@ -125,7 +131,7 @@ Every incoming socket connection must present a valid JWT token via `socket.hand
 - `/register` — Registration Page with validation & error handling
 - `/dashboard` — Protected Dashboard with total document statistics and top 5 recent documents
 - `/documents` — Protected Documents List Page featuring "My Documents" and "Shared With Me" sections
-- `/documents/:id` — Protected Document Editor Page featuring debounced auto-save, save status lifecycle indicators, realtime collaborative synchronization, Last Write Wins (LWW) conflict handling, live connection indicator (`● Live`), and presence bar
+- `/documents/:id` — Protected Document Editor Page featuring debounced auto-save, save status lifecycle indicators, realtime collaborative synchronization, Last Write Wins (LWW) conflict handling, live connection indicator (`● Live`), presence bar, and lazy-loaded Edit History drawer
 
 ## Features
 
@@ -136,3 +142,4 @@ Every incoming socket connection must present a valid JWT token via `socket.hand
 - **Socket.IO Foundation**: Authenticated websockets, room isolation (`document:<id>`), and active user presence tracking
 - **Realtime Editing**: Collaborative editing using Socket.IO room broadcast with Last Write Wins (LWW) resolution and infinite loop prevention
 - **Debounced Auto-Save**: Seamless 800ms background persistence to PostgreSQL with unmount flushing and status indicators
+- **Edit History & Audit Logging**: Immutable `EditEvent` logging on every successful save with paginated REST endpoints and lazy-loaded frontend drawer
