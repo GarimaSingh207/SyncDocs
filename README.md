@@ -13,16 +13,19 @@ SyncDocs/
 │   │   ├── controllers/
 │   │   │   ├── auth.controller.ts
 │   │   │   ├── document.controller.ts
-│   │   │   └── health.controller.ts
+│   │   │   ├── health.controller.ts
+│   │   │   └── sharing.controller.ts
 │   │   ├── middleware/
 │   │   │   └── auth.middleware.ts
 │   │   ├── routes/
 │   │   │   ├── auth.routes.ts
 │   │   │   ├── document.routes.ts
-│   │   │   └── health.routes.ts
+│   │   │   ├── health.routes.ts
+│   │   │   └── sharing.routes.ts
 │   │   ├── schemas/
 │   │   │   ├── auth.schema.ts
-│   │   │   └── document.schema.ts
+│   │   │   ├── document.schema.ts
+│   │   │   └── sharing.schema.ts
 │   │   ├── lib/
 │   │   │   └── prisma.ts
 │   │   ├── app.ts
@@ -46,7 +49,8 @@ SyncDocs/
 │   │   ├── services/
 │   │   │   ├── api.ts
 │   │   │   ├── auth.ts
-│   │   │   └── documents.ts
+│   │   │   ├── documents.ts
+│   │   │   └── sharing.ts
 │   │   └── types/
 │   │       └── index.ts
 │   └── .env.example
@@ -70,12 +74,19 @@ SyncDocs/
 - `POST /api/auth/login` — Authenticate user and receive JWT token (`email`, `password`)
 - `GET /api/profile` — Get authenticated user profile (`Authorization: Bearer <token>`)
 
-### Documents (Owner Access Enforced)
+### Documents & Authorization
 - `GET /api/documents` — Get documents owned by authenticated user (ordered by `updatedAt` desc)
 - `POST /api/documents` — Create a new document (`title`)
-- `GET /api/documents/:id` — Get document details by ID (owner only)
-- `PATCH /api/documents/:id` — Update document title/content (owner only)
-- `DELETE /api/documents/:id` — Delete document by ID (owner only)
+- `GET /api/documents/:id` — Get document details by ID (Accessible by `OWNER`, `EDITOR`, `VIEWER`)
+- `PATCH /api/documents/:id` — Update document title/content (Accessible by `OWNER` & `EDITOR`, `403` for `VIEWER`)
+- `DELETE /api/documents/:id` — Delete document by ID (`OWNER` only)
+
+### Sharing & Collaborator Management (Owner Only)
+- `GET /api/documents/shared` — Get documents shared with authenticated user
+- `GET /api/documents/:id/access` — Get list of collaborators with access (`OWNER` only)
+- `POST /api/documents/:id/share` — Share document with user by email & role (`EDITOR` / `VIEWER`)
+- `PATCH /api/documents/:id/access/:accessId` — Update collaborator role (`EDITOR` / `VIEWER`)
+- `DELETE /api/documents/:id/access/:accessId` — Revoke collaborator access
 
 ## Frontend Routes
 
@@ -83,14 +94,14 @@ SyncDocs/
 - `/login` — Login Page with validation & error handling
 - `/register` — Registration Page with validation & error handling
 - `/dashboard` — Protected Dashboard with total document statistics and top 5 recent documents
-- `/documents` — Protected Documents List Page with creation, open, and deletion modal confirmation
-- `/documents/:id` — Protected Document Editor Page with editable title, textarea content, manual saving, and back navigation
+- `/documents` — Protected Documents List Page featuring "My Documents" and "Shared With Me" sections
+- `/documents/:id` — Protected Document Editor Page displaying role badge, enforcing Viewer read-only restrictions, and providing Owner collaborator management
 
 ## Features
 
 - **Authentication**: User Registration & Login with JWT & bcrypt (persisted via `localStorage` with `AuthContext` and `ProtectedRoute` wrappers)
 - **Document Management**: Create, Rename, Delete, List owned documents with owner authorization
-- **Document Sharing**: Invite users by email with roles (OWNER, EDITOR, VIEWER)
-- **Access Control**: Enforced permissions on REST APIs and Socket.IO events
+- **Document Sharing**: Invite users by email with roles (`OWNER`, `EDITOR`, `VIEWER`), update roles, or revoke access
+- **Access Control**: Enforced permissions on REST APIs (Owner = Full, Editor = Read/Edit, Viewer = Read Only)
 - **Realtime Editing**: Collaborative editing using Socket.IO room broadcast
 - **Persistence & History**: Debounced PostgreSQL saves and edit event logging
