@@ -7,9 +7,20 @@ A real-time collaborative document editing platform built with Node.js, Express,
 ```
 SyncDocs/
 ├── backend/          # Express API & Socket.IO server
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── routes/
+│   │   ├── app.ts
+│   │   └── index.ts
+│   └── .env.example
 ├── frontend/         # React SPA frontend
 └── README.md
 ```
+
+## API Endpoints
+
+### Health Check
+- `GET /api/health` — Returns status of backend server
 
 ## Features
 
