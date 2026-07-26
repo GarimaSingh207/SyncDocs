@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
 import useAuth from './hooks/useAuth';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -20,25 +21,27 @@ const HomeRedirect: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <AuthProvider>
-      <Router>
-        <div className="app-container">
-          <Navbar />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<HomeRedirect />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              
-              {/* Protected Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/documents" element={<DocumentsPage />} />
-                <Route path="/documents/:id" element={<DocumentEditorPage />} />
-              </Route>
-            </Routes>
-          </main>
-        </div>
-      </Router>
+      <SocketProvider>
+        <Router>
+          <div className="app-container">
+            <Navbar />
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<HomeRedirect />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                
+                {/* Protected Routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/documents" element={<DocumentsPage />} />
+                  <Route path="/documents/:id" element={<DocumentEditorPage />} />
+                </Route>
+              </Routes>
+            </main>
+          </div>
+        </Router>
+      </SocketProvider>
     </AuthProvider>
   );
 };
