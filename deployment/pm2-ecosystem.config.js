@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'syncdocs-backend',
       script: 'dist/index.js',
-      cwd: '/var/www/syncdocs/backend',
+      cwd: './backend',
       
       // AWS Free Tier Single Instance Configuration
       // Note: Running 1 instance prevents Socket.IO state fragmentation without Redis Pub/Sub adapter
