@@ -47,8 +47,9 @@ echo "==> Step 5: Running PM2 installer..."
 "${SCRIPT_DIR}/install-pm2.sh"
 
 # 5. Create logging and application deployment workspace directory structure
-echo "==> Step 6: Setting up logging directories..."
+echo "==> Step 6: Setting up logging directories and home directory permissions..."
 mkdir -p "$HOME/logs"
+chmod 755 "$HOME"
 
 echo "======================================================================"
 echo " ✓ Master EC2 Environment Setup Completed Successfully!               "
