@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SyncDocs Pro | File Explorer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-surface {
+            background: rgba(19, 20, 23, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-elevated {
+            background: rgba(26, 28, 32, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 40px 40px -20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(99, 102, 241, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .cubic-bezier {
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .selection-panel-enter {
+            transform: translateY(100%);
+        }
+        .selection-panel-active {
+            transform: translateY(0);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#d0bcff",
+                      "surface-variant": "#353436",
+                      "surface-dim": "#131314",
+                      "inverse-on-surface": "#313031",
+                      "tertiary-fixed-dim": "#c7c6ca",
+                      "secondary-container": "#571bc1",
+                      "error-container": "#93000a",
+                      "on-secondary": "#3c0091",
+                      "on-surface-variant": "#c7c4d7",
+                      "surface-container-low": "#1c1b1c",
+                      "surface-container-high": "#2a2a2b",
+                      "outline": "#908fa0",
+                      "primary-fixed-dim": "#c0c1ff",
+                      "on-primary-fixed-variant": "#2f2ebe",
+                      "on-tertiary-fixed-variant": "#46464a",
+                      "on-error-container": "#ffdad6",
+                      "surface": "#131314",
+                      "tertiary": "#c7c6ca",
+                      "primary": "#c0c1ff",
+                      "tertiary-container": "#919094",
+                      "on-primary-fixed": "#07006c",
+                      "on-secondary-fixed-variant": "#5516be",
+                      "surface-container": "#201f20",
+                      "surface-tint": "#c0c1ff",
+                      "on-tertiary-fixed": "#1b1b1f",
+                      "outline-variant": "#464554",
+                      "tertiary-fixed": "#e3e2e6",
+                      "on-background": "#e5e2e3",
+                      "on-tertiary": "#2f3034",
+                      "surface-container-highest": "#353436",
+                      "on-secondary-container": "#c4abff",
+                      "surface-bright": "#3a393a",
+                      "on-error": "#690005",
+                      "inverse-primary": "#494bd6",
+                      "background": "#131314",
+                      "on-secondary-fixed": "#23005c",
+                      "secondary-fixed": "#e9ddff",
+                      "on-primary": "#1000a9",
+                      "on-primary-container": "#0d0096",
+                      "error": "#ffb4ab",
+                      "surface-container-lowest": "#0e0e0f",
+                      "primary-container": "#8083ff",
+                      "on-tertiary-container": "#292a2d",
+                      "on-surface": "#e5e2e3",
+                      "primary-fixed": "#e1e0ff",
+                      "inverse-surface": "#e5e2e3",
+                      "secondary-fixed-dim": "#d0bcff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-max": "1440px",
+                      "gutter": "24px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "unit": "8px",
+                      "sm": "8px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "display": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "label-md": ["Inter"],
+                      "body-md": ["Inter"],
+                      "mono-sm": ["JetBrains Mono"],
+                      "body-lg": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "headline-md": ["Inter"]
+              },
+              "fontSize": {
+                      "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0", "fontWeight": "400"}],
+                      "mono-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary/30 selection:text-on-primary">
+<div class="flex h-screen overflow-hidden">
+<!-- SideNavBar (from JSON) -->
+<aside class="hidden lg:flex flex-col py-6 w-[280px] h-screen sticky left-0 top-0 border-r border-white/5 bg-surface z-50">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">sync</span>
+</div>
+<div>
+<h1 class="font-display text-headline-md text-on-surface font-bold">SyncDocs Pro</h1>
+<p class="text-on-surface-variant font-body-sm text-[12px]">Engineering Team</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 cubic-bezier rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-primary font-bold border-l-2 border-primary bg-white/5 transition-all duration-200 cubic-bezier rounded-r-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder_open</span>
+<span class="font-body-md text-body-md">Files</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 cubic-bezier rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Team</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 cubic-bezier rounded-xl" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 cubic-bezier rounded-xl" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-body-md">Archive</span>
+</a>
+</nav>
+<div class="px-6 mb-4">
+<button class="w-full py-3 px-4 bg-primary text-on-primary font-bold rounded-xl active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">add</span>
+                    New Document
+                </button>
+</div>
+<div class="px-3 border-t border-white/5 pt-4">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-md text-body-md">Help</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-body-md text-body-md">Notifications</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col min-w-0 bg-surface-dim relative">
+<!-- TopNavBar (from JSON) -->
+<header class="fixed top-0 right-0 z-40 flex justify-between items-center h-16 px-gutter w-full lg:left-[280px] lg:w-[calc(100%-280px)] bg-surface/70 backdrop-blur-xl border-b border-white/5 shadow-sm shadow-black/20">
+<div class="flex items-center gap-8">
+<div class="relative group hidden md:block">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">search</span>
+<input class="bg-surface-container-high border-none rounded-xl pl-10 pr-16 py-2 text-body-sm w-80 focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all duration-200" placeholder="Search files..." type="text"/>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] text-outline-variant font-mono-sm">
+<span class="px-1.5 py-0.5 rounded border border-outline-variant bg-surface-variant">⌘</span>
+<span class="px-1.5 py-0.5 rounded border border-outline-variant bg-surface-variant">K</span>
+</div>
+</div>
+<nav class="hidden sm:flex items-center gap-6">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-sm transition-all duration-200" href="#">Shared</a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-lg px-2 py-1 font-body-sm transition-all duration-200" href="#">Recent</a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-lg px-2 py-1 font-body-sm transition-all duration-200" href="#">Starred</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 bg-primary/10 text-primary font-semibold rounded-xl text-body-sm hover:bg-primary/20 transition-all duration-200">History</button>
+<button class="px-6 py-2 bg-primary text-on-primary font-bold rounded-xl text-body-sm hover:scale-[0.98] transition-all duration-200">Share</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/10 ml-2">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a professional woman with glasses, smiling warmly, in a high-tech modern office environment. Soft cinematic lighting with blue and violet hues, shot on a high-end lens with shallow depth of field. Professional corporate photography style, dark mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS01MZZmsjieKSSYi4HY9kLCRkDkUhAdn14Pg4WkXmZu5Um_YAj0FYj_jDF-4h6BF0I9W3B9rRCkJySL1vJqYKjWRDejyXO7Uwb5S4v0XHintgPpUCDL2HgyDDgQiQegjO8m6sjv3xIpMlQ5sKqNlcBPFcGDupdbpXGMhW6zcDOr2r_LFcqRzgYgfviySJHA-I52iOTBYvxMY2VFBaGdQ9_m1PaC3S3LRATbZIv15CD26bLQ4_MAYn"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="flex-1 mt-16 flex overflow-hidden">
+<!-- Folder Tree (Sidebar Panel) -->
+<nav class="w-64 border-r border-white/5 p-4 flex-shrink-0 overflow-y-auto custom-scrollbar hidden md:block">
+<div class="space-y-4">
+<div>
+<p class="text-outline text-[11px] font-bold uppercase tracking-wider mb-2 px-2">Folders</p>
+<div class="space-y-1">
+<button class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 text-on-surface-variant hover:text-on-surface transition-all">
+<span class="material-symbols-outlined text-lg">arrow_drop_down</span>
+<span class="material-symbols-outlined text-lg text-primary">folder</span>
+<span class="text-body-sm">Work</span>
+</button>
+<div class="pl-6 space-y-1">
+<button class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 text-on-surface transition-all">
+<span class="material-symbols-outlined text-lg text-primary" style="font-variation-settings: 'FILL' 1;">folder</span>
+<span class="text-body-sm">Designs</span>
+</button>
+<button class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 text-on-surface-variant transition-all">
+<span class="material-symbols-outlined text-lg">folder</span>
+<span class="text-body-sm">Marketing</span>
+</button>
+</div>
+<button class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 text-on-surface-variant transition-all">
+<span class="material-symbols-outlined text-lg">arrow_right</span>
+<span class="material-symbols-outlined text-lg">folder</span>
+<span class="text-body-sm">Personal</span>
+</button>
+<button class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 text-on-surface-variant transition-all">
+<span class="material-symbols-outlined text-lg">arrow_right</span>
+<span class="material-symbols-outlined text-lg">folder</span>
+<span class="text-body-sm">Assets</span>
+</button>
+</div>
+</div>
+<div>
+<p class="text-outline text-[11px] font-bold uppercase tracking-wider mb-2 px-2">Labels</p>
+<div class="space-y-1">
+<button class="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-white/5 text-on-surface-variant transition-all">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="text-body-sm">Critical</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-white/5 text-on-surface-variant transition-all">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-body-sm">Reviewing</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-white/5 text-on-surface-variant transition-all">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<span class="text-body-sm">Drafts</span>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<!-- File List / Table -->
+<section class="flex-1 overflow-y-auto custom-scrollbar p-6">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<h2 class="font-headline-md text-headline-md">All Files</h2>
+<span class="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-outline uppercase font-bold">128 items</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg hover:bg-white/5 text-on-surface-variant transition-all"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="p-2 rounded-lg bg-white/10 text-primary transition-all"><span class="material-symbols-outlined">list</span></button>
+<div class="w-[1px] h-6 bg-white/10 mx-2"></div>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 text-body-sm transition-all">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                                Filter
+                            </button>
+</div>
+</div>
+<!-- Table Header -->
+<div class="grid grid-cols-[48px_1fr_180px_140px_100px_160px_48px] items-center px-4 py-3 bg-white/5 rounded-t-xl border-x border-t border-white/5 text-[12px] font-bold text-outline uppercase tracking-wider">
+<div class="flex justify-center">
+<input class="rounded border-white/20 bg-transparent text-primary focus:ring-primary/50 transition-all" id="select-all" type="checkbox"/>
+</div>
+<div class="flex items-center gap-1 cursor-pointer hover:text-on-surface transition-colors">Name <span class="material-symbols-outlined text-[14px]">expand_more</span></div>
+<div class="flex items-center gap-1 cursor-pointer hover:text-on-surface transition-colors">Last Modified</div>
+<div class="flex items-center gap-1 cursor-pointer hover:text-on-surface transition-colors">Author</div>
+<div class="flex items-center gap-1 cursor-pointer hover:text-on-surface transition-colors">Size</div>
+<div>Tags</div>
+<div></div>
+</div>
+<!-- File Items -->
+<div class="border-x border-b border-white/5 rounded-b-xl divide-y divide-white/5">
+<!-- Item 1 -->
+<div class="file-row grid grid-cols-[48px_1fr_180px_140px_100px_160px_48px] items-center px-4 py-4 hover:bg-white/[0.03] transition-all cubic-bezier group">
+<div class="flex justify-center">
+<input class="file-checkbox rounded border-white/20 bg-transparent text-primary focus:ring-primary/50 transition-all" type="checkbox"/>
+</div>
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-body-md text-on-surface truncate">API_Technical_Specs_v2.pdf</span>
+</div>
+<div class="text-body-sm text-on-surface-variant">2 hours ago</div>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-[10px] text-secondary font-bold">AS</div>
+<span class="text-body-sm text-on-surface-variant">Alex Smith</span>
+</div>
+<div class="text-body-sm text-on-surface-variant">4.2 MB</div>
+<div class="flex gap-1 overflow-hidden">
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">Technical</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-[10px] font-medium">v2</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<!-- Item 2 -->
+<div class="file-row grid grid-cols-[48px_1fr_180px_140px_100px_160px_48px] items-center px-4 py-4 hover:bg-white/[0.03] transition-all cubic-bezier group">
+<div class="flex justify-center">
+<input class="file-checkbox rounded border-white/20 bg-transparent text-primary focus:ring-primary/50 transition-all" type="checkbox"/>
+</div>
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">image</span>
+<span class="font-body-md text-on-surface truncate">Brand_Identity_Concept.fig</span>
+</div>
+<div class="text-body-sm text-on-surface-variant">Yesterday, 4:12 PM</div>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary font-bold">JD</div>
+<span class="text-body-sm text-on-surface-variant">Jane Doe</span>
+</div>
+<div class="text-body-sm text-on-surface-variant">28.5 MB</div>
+<div class="flex gap-1">
+<span class="px-2 py-0.5 rounded-full bg-error/10 text-error text-[10px] font-medium">Final</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<!-- Item 3 -->
+<div class="file-row grid grid-cols-[48px_1fr_180px_140px_100px_160px_48px] items-center px-4 py-4 hover:bg-white/[0.03] transition-all cubic-bezier group">
+<div class="flex justify-center">
+<input class="file-checkbox rounded border-white/20 bg-transparent text-primary focus:ring-primary/50 transition-all" type="checkbox"/>
+</div>
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-on-surface-variant">table_chart</span>
+<span class="font-body-md text-on-surface truncate">Q4_Financial_Report.xlsx</span>
+</div>
+<div class="text-body-sm text-on-surface-variant">Dec 12, 2023</div>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-tertiary/20 flex items-center justify-center text-[10px] text-tertiary font-bold">MK</div>
+<span class="text-body-sm text-on-surface-variant">Mike Kang</span>
+</div>
+<div class="text-body-sm text-on-surface-variant">842 KB</div>
+<div class="flex gap-1">
+<span class="px-2 py-0.5 rounded-full bg-white/10 text-outline text-[10px] font-medium">Archive</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<!-- Item 4 -->
+<div class="file-row grid grid-cols-[48px_1fr_180px_140px_100px_160px_48px] items-center px-4 py-4 hover:bg-white/[0.03] transition-all cubic-bezier group">
+<div class="flex justify-center">
+<input class="file-checkbox rounded border-white/20 bg-transparent text-primary focus:ring-primary/50 transition-all" type="checkbox"/>
+</div>
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">folder</span>
+<span class="font-body-md text-on-surface truncate">Landing_Page_Assets</span>
+</div>
+<div class="text-body-sm text-on-surface-variant">Oct 2, 2023</div>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-[10px] text-secondary font-bold">AS</div>
+<span class="text-body-sm text-on-surface-variant">Alex Smith</span>
+</div>
+<div class="text-body-sm text-on-surface-variant">--</div>
+<div class="flex gap-1">
+<span class="px-2 py-0.5 rounded-full bg-white/10 text-outline text-[10px] font-medium">Assets</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Bulk Actions Bar -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-fit px-8 py-4 glass-elevated rounded-2xl flex items-center gap-8 selection-panel-enter transition-transform duration-300 z-50" id="selection-bar">
+<div class="flex items-center gap-4 pr-8 border-r border-white/10">
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="text-primary font-bold font-mono-sm" id="selection-count">0</span>
+</div>
+<span class="font-body-md font-semibold text-on-surface">Selected</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-2 px-4 py-2 hover:bg-white/5 rounded-xl transition-all text-on-surface-variant hover:text-on-surface group">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">download</span>
+<span class="text-body-sm">Download</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 hover:bg-white/5 rounded-xl transition-all text-on-surface-variant hover:text-on-surface group">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">drive_file_move</span>
+<span class="text-body-sm">Move</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 hover:bg-white/5 rounded-xl transition-all text-on-surface-variant hover:text-on-surface group">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">share</span>
+<span class="text-body-sm">Share</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 hover:bg-error/10 rounded-xl transition-all text-error group ml-2">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">delete</span>
+<span class="text-body-sm font-semibold">Delete</span>
+</button>
+</div>
+<button class="ml-4 p-2 rounded-full hover:bg-white/10 transition-all" id="close-selection">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</main>
+</div>
+<!-- Micro-interaction Scripts -->
+<script>
+        const selectionBar = document.getElementById('selection-bar');
+        const selectionCountSpan = document.getElementById('selection-count');
+        const checkboxes = document.querySelectorAll('.file-checkbox');
+        const selectAllCheckbox = document.getElementById('select-all');
+        const closeSelectionBtn = document.getElementById('close-selection');
+
+        function updateSelection() {
+            const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+            const count = checkedBoxes.length;
+
+            if (count > 0) {
+                selectionCountSpan.innerText = count;
+                selectionBar.classList.remove('selection-panel-enter');
+                selectionBar.classList.add('selection-panel-active');
+            } else {
+                selectionBar.classList.remove('selection-panel-active');
+                selectionBar.classList.add('selection-panel-enter');
+            }
+
+            // Visual feedback on rows
+            checkboxes.forEach(cb => {
+                const row = cb.closest('.file-row');
+                if (cb.checked) {
+                    row.classList.add('bg-primary/[0.05]', 'border-l-2', 'border-primary');
+                } else {
+                    row.classList.remove('bg-primary/[0.05]', 'border-l-2', 'border-primary');
+                }
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateSelection);
+        });
+
+        selectAllCheckbox.addEventListener('change', () => {
+            checkboxes.forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+            });
+            updateSelection();
+        });
+
+        closeSelectionBtn.addEventListener('click', () => {
+            checkboxes.forEach(cb => cb.checked = false);
+            selectAllCheckbox.checked = false;
+            updateSelection();
+        });
+
+        // Keyboard Shortcut Listener (CMD+K simulation)
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('input[type="text"]').focus();
+            }
+        });
+    </script>
+</body></html>

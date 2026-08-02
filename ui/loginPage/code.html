@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SyncDocs | Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#292a2d",
+                    "surface-variant": "#353436",
+                    "primary-fixed": "#e1e0ff",
+                    "secondary-fixed": "#e9ddff",
+                    "on-error-container": "#ffdad6",
+                    "primary-fixed-dim": "#c0c1ff",
+                    "on-tertiary": "#2f3034",
+                    "inverse-on-surface": "#313031",
+                    "secondary-container": "#571bc1",
+                    "surface-container-lowest": "#0e0e0f",
+                    "tertiary": "#c7c6ca",
+                    "surface-dim": "#131314",
+                    "on-error": "#690005",
+                    "inverse-surface": "#e5e2e3",
+                    "on-secondary-container": "#c4abff",
+                    "surface": "#131314",
+                    "surface-bright": "#3a393a",
+                    "on-secondary-fixed-variant": "#5516be",
+                    "inverse-primary": "#494bd6",
+                    "tertiary-fixed-dim": "#c7c6ca",
+                    "secondary": "#d0bcff",
+                    "on-secondary-fixed": "#23005c",
+                    "on-tertiary-fixed": "#1b1b1f",
+                    "on-primary-container": "#0d0096",
+                    "surface-container-low": "#1c1b1c",
+                    "outline-variant": "#464554",
+                    "surface-tint": "#c0c1ff",
+                    "on-tertiary-fixed-variant": "#46464a",
+                    "tertiary-fixed": "#e3e2e6",
+                    "on-surface": "#e5e2e3",
+                    "on-background": "#e5e2e3",
+                    "primary": "#c0c1ff",
+                    "tertiary-container": "#919094",
+                    "surface-container-highest": "#353436",
+                    "on-secondary": "#3c0091",
+                    "secondary-fixed-dim": "#d0bcff",
+                    "outline": "#908fa0",
+                    "error": "#ffb4ab",
+                    "background": "#131314",
+                    "surface-container-high": "#2a2a2b",
+                    "surface-container": "#201f20",
+                    "on-primary-fixed": "#07006c",
+                    "error-container": "#93000a",
+                    "on-primary-fixed-variant": "#2f2ebe",
+                    "primary-container": "#8083ff",
+                    "on-primary": "#1000a9",
+                    "on-surface-variant": "#c7c4d7"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "unit": "8px",
+                    "container-max": "1440px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "mono-sm": ["JetBrains Mono"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "mono-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0B;
+            color: #e5e2e3;
+            overflow: hidden;
+        }
+        .glass-surface {
+            background: rgba(19, 20, 23, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.5), 0 0 20px 0 rgba(99, 102, 241, 0.05);
+        }
+        .light-leak {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .collaboration-stage {
+            perspective: 1000px;
+        }
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(0.5deg); }
+        }
+        .cursor-anim {
+            animation: cursor-move 8s ease-in-out infinite;
+        }
+        @keyframes cursor-move {
+            0%, 100% { transform: translate(140px, 80px); }
+            33% { transform: translate(220px, 120px); }
+            66% { transform: translate(180px, 60px); }
+        }
+        .cursor-anim-2 {
+            animation: cursor-move-2 10s ease-in-out infinite;
+        }
+        @keyframes cursor-move-2 {
+            0%, 100% { transform: translate(300px, 200px); }
+            50% { transform: translate(120px, 180px); }
+        }
+        input:focus {
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md h-screen overflow-hidden">
+<main class="flex h-screen w-screen overflow-hidden">
+<!-- Left Panel: Collaboration Scene -->
+<section class="hidden lg:flex lg:w-[45%] relative items-center justify-center overflow-hidden border-r border-white/5">
+<!-- Animated Shader Background -->
+
+<!-- Atmospheric Glows -->
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary-container/20 blur-[120px] rounded-full pointer-events-none"></div>
+<!-- Collaboration Mockup -->
+<div class="collaboration-stage relative w-full h-full flex items-center justify-center z-10 p-xl">
+<!-- Main Editor Window -->
+<div class="floating-element glass-surface light-leak rounded-xl w-full max-w-[520px] aspect-[4/3] p-lg flex flex-col gap-md overflow-hidden transform rotate-[-1deg]">
+<!-- Editor Header -->
+<div class="flex items-center justify-between border-b border-white/10 pb-md">
+<div class="flex items-center gap-sm">
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-error/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-primary/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-on-surface-variant/20"></div>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant/60 ml-md">latency-optimization.md</span>
+</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-pink-500 bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up professional studio portrait of a woman named Sarah with friendly expression, warm lighting, blurred office background, high-end photography style consistent with a dark premium UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHIu1pyQAbmk5qwmTe9PoYKofzHANcHeW4FCqD39CE952GteaCe24KZwwGKNG5myEQlCWvJMkvnmZDwSV4FGCUE6zyJW8OKG7uhhaqutF4yv1S4TB-gCkZDgqMokNz0OPWbvclR29oUwC87Cj5qU_-SiuDN_pFbx3QWzIoCUIdilhiNl-OYcGntHRahL84Yx4hjEVajD2pGpW0PicOpZF4MmIlpHkltMmc0DZJr6k2jTtbqC2SpGZa"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-indigo-500 bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up professional studio portrait of a man named Alex, modern creative professional look, cool lighting, minimalist aesthetic, high-quality digital photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBga1gA8ArbRN2SmXq3OA1tFVMswDgU2HRVWAIFYy6eOSK0WV51dOgdkatU7vFWmg9Hao0C7T85XQA-GsG6GEkR6-Ut_K-v-kWub6ofokIsKC40YiRN6p4Jxtp9W71bspz4yTdhqV2qcU1U05hHFgvQ7RnCQxE56G0BrfiBXHQua4BQwVsYqqNvAi9aPpZq5NUkMVYOnZMyRakvJuLeTPEgpVZ96R_Y6mtL5hpU2snC666RONv_LlTU"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-green-500 bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up professional studio portrait of a man named Mark, tech entrepreneur aesthetic, soft focus background, dark mode color grading, professional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0WdUAuNjAC6PkMIyUx4jq0d4A83fFsuEyW4aSeOoIRHqpBEJVPnIswcPhUm3owVw_liiE4HC2t4c0kOocS0YwJBnnZvHBj-FR2-frX7G4lJI5HmHiu7Up4ZC7X9PF48T9jRDxWCfAA9w2OLjP78IJaqOgqR5r2ylEW6jpuOqGc8YHYQyBvP_MOG3z7Y91gs5ENe1qjd73iB1EllUkdzW6T1gswMpzl1jYJ3NpHAmANLMVy97D0u2-"/>
+</div>
+</div>
+</div>
+<!-- Editor Content Area -->
+<div class="relative flex-1 font-mono-sm text-mono-sm leading-relaxed text-on-surface/80 p-sm overflow-hidden">
+<p class="mb-md"><span class="text-primary font-bold"># Latency Metrics 2024</span></p>
+<p class="mb-sm">Our primary goal is to reduce the TTFB (Time to First Byte) across all edge nodes. Preliminary data suggests that the new sync engine is 40% faster than the previous WebSocket implementation.</p>
+<p class="mb-sm text-on-surface-variant/40">---</p>
+<p class="mb-sm">Current average response time: 42ms</p>
+<p class="mb-sm">Projected average response time: 24ms</p>
+<!-- Animated Cursors -->
+<div class="absolute cursor-anim flex flex-col items-start pointer-events-none">
+<span class="material-symbols-outlined text-pink-500 -ml-1.5 -mt-1" style="font-size: 20px;">near_me</span>
+<span class="bg-pink-500 text-white px-1.5 py-0.5 rounded-sm text-[10px] font-bold">Sarah</span>
+</div>
+<div class="absolute cursor-anim-2 flex flex-col items-start pointer-events-none">
+<span class="material-symbols-outlined text-indigo-400 -ml-1.5 -mt-1" style="font-size: 20px;">near_me</span>
+<span class="bg-indigo-400 text-white px-1.5 py-0.5 rounded-sm text-[10px] font-bold">Alex</span>
+</div>
+</div>
+<!-- Footer / Status -->
+<div class="flex items-center justify-between mt-auto pt-sm border-t border-white/5">
+<div class="flex items-center gap-xs text-primary/80 font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span>Saved just now</span>
+</div>
+</div>
+</div>
+<!-- Floating Version History Card -->
+<div class="absolute top-[20%] right-[-5%] floating-element glass-surface light-leak rounded-lg p-md w-48 shadow-2xl transition-transform duration-300" style="animation-delay: -2s;">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Version History</h4>
+<div class="space-y-sm">
+<div class="flex items-center justify-between text-[11px]">
+<span class="text-on-surface">V2.1.0</span>
+<span class="text-on-surface-variant/60">2m ago</span>
+</div>
+<div class="flex items-center justify-between text-[11px] opacity-60">
+<span class="text-on-surface">V2.0.9</span>
+<span class="text-on-surface-variant/60">1h ago</span>
+</div>
+<div class="w-full h-[1px] bg-white/10"></div>
+<button class="w-full text-center text-primary font-label-md text-[10px] hover:text-white transition-colors">View All Changes</button>
+</div>
+</div>
+<!-- Floating Comment Bubble -->
+<div class="absolute bottom-[15%] left-[-10%] floating-element glass-surface light-leak rounded-xl p-md w-64 shadow-2xl transform rotate-[2deg]" style="animation-delay: -4s;">
+<div class="flex items-start gap-md">
+<div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 border border-green-500/30">
+<img class="w-full h-full rounded-full object-cover" data-alt="Small circular avatar of Mark, a tech-focused professional, simplified for a UI comment bubble, warm highlights, high-end digital art style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU8Y2zY3dA8eQ-UkZ3LepFvurFTJHh6DY2ry-npGKq3HLE4jH908yHnbVjUkMIus9FLSgKiotmQItuEEv7V3dYOKChWW58P82zWLbA6OjGn132UONqZMpiX1hwjFw57myEctIr7UpUvP6tSLrfx1LpJpFzMRz06ZvS99jPd65_T1RjFT40B0dAdo-85YRZlDwlTWiRMeWMtNeYawwAzFbFVAEULjqv_rIvY1UPTW8ioXCKnYL1U-pr"/>
+</div>
+<div class="space-y-xs">
+<p class="font-label-md text-label-md font-bold text-on-surface">Mark</p>
+<p class="text-body-sm text-[12px] text-on-surface-variant leading-snug">Should we update the latency metrics for the quarterly report?</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Panel: Auth -->
+<section class="flex-1 flex items-center justify-center p-md bg-background relative">
+<div class="w-full max-w-[480px] z-10 px-md">
+<div class="flex flex-col mb-xl">
+<div class="mb-lg">
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">SyncDocs</span>
+</div>
+<h1 class="font-display text-display font-extrabold text-on-surface mb-xs">Welcome Back</h1>
+<p class="text-on-surface-variant font-body-md text-body-md">Continue collaborating with your team in real time.</p>
+</div>
+<form class="space-y-lg" onsubmit="event.preventDefault();">
+<!-- Email Input -->
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest" for="email">Email Address</label>
+<div class="relative group">
+<div class="absolute left-md top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-primary text-on-surface-variant/40">
+<span class="material-symbols-outlined">mail</span>
+</div>
+<input class="w-full h-14 bg-surface border border-white/10 rounded-xl px-xl pl-14 text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none focus:border-primary transition-all duration-200" id="email" placeholder="name@company.com" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest" for="password">Password</label>
+<a class="text-[12px] text-primary hover:text-white transition-colors" href="#">Forgot Password?</a>
+</div>
+<div class="relative group">
+<div class="absolute left-md top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-primary text-on-surface-variant/40">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<input class="w-full h-14 bg-surface border border-white/10 rounded-xl px-xl pl-14 text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none focus:border-primary transition-all duration-200" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-on-surface transition-colors focus:outline-none" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined" id="pw-toggle-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full h-14 bg-primary text-on-primary font-body-md font-bold rounded-xl shadow-lg shadow-primary/10 hover:shadow-primary/25 hover:translate-y-[-2px] active:translate-y-[0px] active:scale-[0.98] transition-all duration-200 ease-in-out">
+                        Sign In
+                    </button>
+<!-- Divider -->
+<div class="flex items-center gap-md my-sm">
+<div class="flex-1 h-[1px] bg-white/5"></div>
+<span class="text-on-surface-variant/40 font-label-md text-[10px] uppercase">Or</span>
+<div class="flex-1 h-[1px] bg-white/5"></div>
+</div>
+<!-- Google Login -->
+<button class="w-full h-14 bg-surface border border-white/10 text-on-surface font-body-md font-medium rounded-xl hover:bg-surface-container-high transition-all duration-200 flex items-center justify-center gap-md group">
+<svg class="w-5 h-5 group-hover:scale-110 transition-transform" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+                        Continue with Google
+                    </button>
+</form>
+<div class="mt-xl text-center">
+<p class="text-on-surface-variant text-body-sm">
+                        Don't have an account? 
+                        <a class="text-primary font-semibold hover:underline ml-1" href="#">Create an account</a>
+</p>
+</div>
+</div>
+<!-- Mobile Bottom Accents -->
+<div class="absolute bottom-md left-0 right-0 lg:hidden flex justify-center opacity-20 pointer-events-none">
+<span class="font-mono-sm text-[10px] text-on-surface-variant uppercase tracking-[0.2em]">SyncDocs v2.4.1 — Enterprise Cloud</span>
+</div>
+</section>
+</main>
+<script>
+        function togglePassword() {
+            const pwInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('pw-toggle-icon');
+            if (pwInput.type === 'password') {
+                pwInput.type = 'text';
+                toggleIcon.textContent = 'visibility_off';
+            } else {
+                pwInput.type = 'password';
+                toggleIcon.textContent = 'visibility';
+            }
+        }
+
+        // Subtle mouse interaction for the glass card on the left
+        const stage = document.querySelector('.collaboration-stage');
+        const editor = document.querySelector('.floating-element');
+        
+        if (stage && editor) {
+            stage.addEventListener('mousemove', (e) => {
+                const { clientX, clientY } = e;
+                const { left, top, width, height } = stage.getBoundingClientRect();
+                const x = (clientX - left) / width - 0.5;
+                const y = (clientY - top) / height - 0.5;
+                
+                editor.style.transform = `rotateY(${x * 10}deg) rotateX(${y * -10}deg) rotate(-1deg)`;
+            });
+            
+            stage.addEventListener('mouseleave', () => {
+                editor.style.transform = `rotateY(0deg) rotateX(0deg) rotate(-1deg)`;
+            });
+        }
+    </script>
+</body></html>

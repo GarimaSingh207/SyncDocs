@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-secondary-container": "#c4abff",
+                  "inverse-primary": "#494bd6",
+                  "inverse-on-surface": "#313031",
+                  "surface-dim": "#131314",
+                  "on-tertiary": "#2f3034",
+                  "secondary": "#d0bcff",
+                  "surface-container-low": "#1c1b1c",
+                  "on-tertiary-fixed": "#1b1b1f",
+                  "primary": "#c0c1ff",
+                  "on-surface": "#e5e2e3",
+                  "primary-container": "#8083ff",
+                  "primary-fixed": "#e1e0ff",
+                  "on-surface-variant": "#c7c4d7",
+                  "error-container": "#93000a",
+                  "secondary-fixed": "#e9ddff",
+                  "on-tertiary-container": "#292a2d",
+                  "primary-fixed-dim": "#c0c1ff",
+                  "secondary-fixed-dim": "#d0bcff",
+                  "on-error-container": "#ffdad6",
+                  "on-primary-container": "#0d0096",
+                  "on-secondary-fixed-variant": "#5516be",
+                  "tertiary-container": "#919094",
+                  "outline-variant": "#464554",
+                  "on-primary": "#1000a9",
+                  "tertiary": "#c7c6ca",
+                  "surface-container-high": "#2a2a2b",
+                  "on-primary-fixed": "#07006c",
+                  "background": "#131314",
+                  "tertiary-fixed-dim": "#c7c6ca",
+                  "surface": "#131314",
+                  "tertiary-fixed": "#e3e2e6",
+                  "surface-container-highest": "#353436",
+                  "on-primary-fixed-variant": "#2f2ebe",
+                  "surface-bright": "#3a393a",
+                  "surface-variant": "#353436",
+                  "on-tertiary-fixed-variant": "#46464a",
+                  "on-background": "#e5e2e3",
+                  "error": "#ffb4ab",
+                  "on-secondary": "#3c0091",
+                  "surface-container-lowest": "#0e0e0f",
+                  "outline": "#908fa0",
+                  "on-secondary-fixed": "#23005c",
+                  "surface-container": "#201f20",
+                  "surface-tint": "#c0c1ff",
+                  "inverse-surface": "#e5e2e3",
+                  "on-error": "#690005",
+                  "secondary-container": "#571bc1"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "margin-mobile": "16px",
+                  "container-max": "1440px",
+                  "xl": "32px",
+                  "md": "16px",
+                  "gutter": "24px",
+                  "lg": "24px",
+                  "xs": "4px",
+                  "unit": "8px",
+                  "sm": "8px"
+          },
+          "fontFamily": {
+                  "body-lg": ["Inter"],
+                  "headline-lg": ["Inter"],
+                  "mono-sm": ["jetbrainsMono"],
+                  "headline-md": ["Inter"],
+                  "display": ["Inter"],
+                  "body-md": ["Inter"],
+                  "label-md": ["Inter"],
+                  "body-sm": ["Inter"]
+          },
+          "fontSize": {
+                  "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0", "fontWeight": "400"}],
+                  "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                  "mono-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0", "fontWeight": "400"}],
+                  "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0", "fontWeight": "400"}],
+                  "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                  "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #0A0A0B;
+      color: #e5e2e3;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-card {
+      background: rgba(19, 20, 23, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 40px 40px -20px rgba(0, 0, 0, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+    .pill-active { position: relative; }
+    .pill-active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 25%;
+      height: 50%;
+      width: 2px;
+      background-color: #c0c1ff;
+    }
+  </style>
+</head>
+<body class="font-body-md text-body-md antialiased overflow-hidden">
+<!-- TopNavBar Shell -->
+<nav class="fixed top-0 w-full z-50 h-16 bg-surface/70 backdrop-blur-lg border-b border-white/10 flex justify-between items-center px-lg shadow-sm">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">SyncDocs</span>
+<div class="hidden md:flex ml-xl items-center bg-white/5 rounded-lg px-sm py-xs border border-white/5">
+<span class="material-symbols-outlined text-on-surface-variant mr-xs">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-64 text-on-surface" placeholder="Search documentation..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-white/5 p-xs rounded-lg duration-200">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-white/5 p-xs rounded-lg duration-200">help</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A professional close-up headshot of a person with a friendly expression, styled for a high-end tech environment. The lighting is soft and cinematic with a cool-toned studio background. The overall aesthetic is clean, minimalist, and authoritative, matching a premium enterprise software user profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6Iy4h7ou7b9uY9aLzdNvoOZa2zWa0yhHNiYXy5gfii1OlMq4Nk2FJBkreTAmfoUU1SszpO34N_Cvk_mvgowTiP0T01-m2cmLalFrI_ohX3P_hGkPkvY3MjDrO04z-i2vy1T6VOFPODzlaXCBkjIcKEMop9qL4KVpPfX4MSvXzF_DHUuD5F64PcZnX1sR975AvJ8KkYehIWBF0rovwgUcW9Gqa3Q79b7YlULq5poVnmEm8XlPU5Qqb"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full w-64 z-40 bg-surface border-r border-white/5 pt-20 flex flex-col p-md gap-sm shadow-xl">
+<div class="flex items-center gap-md mb-lg px-sm">
+<div class="h-10 w-10 bg-primary-container rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">sync_alt</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-bold text-on-surface">SyncDocs</h3>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant">Enterprise Pro</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-lg transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-lg transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Documents</span>
+</a>
+<!-- Active State for Settings/Profile -->
+<a class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container rounded-lg border-l-2 border-primary pill-active transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<button class="mt-auto bg-primary text-on-primary px-md py-sm rounded-lg font-label-md text-label-md font-bold hover:scale-[1.02] active:scale-95 transition-transform flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined">add</span>
+      New Document
+    </button>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 mt-16 h-[calc(100vh-64px)] overflow-y-auto custom-scrollbar bg-surface-container-lowest">
+<!-- Page Header -->
+<header class="sticky top-0 z-30 px-xl py-lg bg-surface-container-lowest/80 backdrop-blur-md flex justify-between items-end border-b border-white/5">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">My Profile</h1>
+<p class="text-on-surface-variant font-body-sm text-body-sm mt-xs">Manage your personal account, security and preferences.</p>
+</div>
+<div class="flex gap-md pb-xs">
+<button class="px-lg py-sm rounded-lg border border-white/10 text-on-surface hover:bg-white/5 transition-colors font-label-md text-label-md">Discard Changes</button>
+<button class="px-lg py-sm rounded-lg bg-primary text-on-primary hover:scale-[0.98] transition-transform font-label-md text-label-md font-bold shadow-lg shadow-primary/20">Save Changes</button>
+</div>
+</header>
+<div class="max-w-[1200px] mx-auto p-xl space-y-xl">
+<!-- 1. PROFILE OVERVIEW -->
+<section class="glass-card rounded-xl p-xl flex flex-col md:flex-row items-center gap-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-lg opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[120px]">account_circle</span>
+</div>
+<div class="relative group">
+<div class="w-32 h-32 rounded-2xl overflow-hidden border-2 border-primary/20 p-1 bg-surface-container-high">
+<img class="w-full h-full object-cover rounded-xl" data-alt="A close-up portrait of a designer with short dark hair and a professional black turtleneck, looking confidently at the camera. The background is a blurred high-tech workspace with soft blue and purple lighting accents. The style is hyper-realistic and modern, emphasizing clarity and corporate elegance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIWA-dPvpHCMHCMtXQnFVEDh1r02cWKp8jZLWyOu5qGGNVRIWzBS49c9n-8ZQb5Cl380j_gOKdFkOcbw2YmM8xONaLmI_YWQYCOrdXmLI5rqAtgXILrwuaYXNnyd0nW2vuOfW3I7RrXKG5eyaBY6DZeXJDCjo6AM_ctcblOu29BfmAgKL1e7ngFBkpE2AIIA4ebz5wX72eBAn3QKwrWmh8G6Yu7Ti3ZhX8lz7IBMu5d1PlVByVhSt6"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-[#131417] shadow-lg"></div>
+</div>
+<div class="flex-1 text-center md:text-left space-y-sm">
+<div class="flex flex-col md:flex-row md:items-center gap-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface">Alex Johnson</h2>
+<span class="px-sm py-xs bg-primary-container/20 text-primary text-[10px] font-bold rounded uppercase tracking-widest self-center md:self-auto">Online</span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md">Senior Product Designer @ SyncDocs HQ</p>
+<div class="flex flex-wrap justify-center md:justify-start gap-xl mt-md">
+<div class="flex flex-col">
+<span class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider text-[10px]">Username</span>
+<span class="text-on-surface font-mono-sm text-mono-sm">@alexj</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider text-[10px]">Email Address</span>
+<span class="text-on-surface">alex.johnson@syncdocs.io</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider text-[10px]">Member Since</span>
+<span class="text-on-surface">Jan 2024</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<button class="bg-secondary-container text-on-secondary-container px-lg py-sm rounded-lg font-label-md text-label-md font-bold hover:bg-secondary-container/80 transition-colors">Upload New Photo</button>
+<button class="px-lg py-sm rounded-lg text-error hover:bg-error/10 transition-colors font-label-md text-label-md">Remove Photo</button>
+</div>
+</section>
+<!-- 7. ACCOUNT STATISTICS (Bento Style) -->
+<section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-md">
+<div class="bg-surface-container-high border border-white/5 rounded-xl p-md flex flex-col items-center justify-center text-center space-y-xs group hover:bg-surface-container-highest transition-colors">
+<span class="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">Docs Created</span>
+<span class="text-headline-md font-bold text-primary group-hover:scale-110 transition-transform">124</span>
+</div>
+<div class="bg-surface-container-high border border-white/5 rounded-xl p-md flex flex-col items-center justify-center text-center space-y-xs group hover:bg-surface-container-highest transition-colors">
+<span class="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">Docs Shared</span>
+<span class="text-headline-md font-bold text-on-surface group-hover:scale-110 transition-transform">86</span>
+</div>
+<div class="bg-surface-container-high border border-white/5 rounded-xl p-md flex flex-col items-center justify-center text-center space-y-xs group hover:bg-surface-container-highest transition-colors">
+<span class="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">Comments</span>
+<span class="text-headline-md font-bold text-on-surface group-hover:scale-110 transition-transform">432</span>
+</div>
+<div class="bg-surface-container-high border border-white/5 rounded-xl p-md flex flex-col items-center justify-center text-center space-y-xs group hover:bg-surface-container-highest transition-colors">
+<span class="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">Collaborators</span>
+<span class="text-headline-md font-bold text-on-surface group-hover:scale-110 transition-transform">12</span>
+</div>
+<div class="bg-surface-container-high border border-white/5 rounded-xl p-md flex flex-col items-center justify-center text-center space-y-xs group hover:bg-surface-container-highest transition-colors">
+<span class="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">Storage</span>
+<span class="text-headline-md font-bold text-secondary group-hover:scale-110 transition-transform">4.2GB</span>
+<span class="text-[9px] text-on-surface-variant">of 5GB</span>
+</div>
+<div class="bg-surface-container-high border border-white/5 rounded-xl p-md flex flex-col items-center justify-center text-center space-y-xs group hover:bg-surface-container-highest transition-colors">
+<span class="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">Hours Active</span>
+<span class="text-headline-md font-bold text-on-surface group-hover:scale-110 transition-transform">1,240h</span>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-xl">
+<!-- 2. PERSONAL INFORMATION (Large Span) -->
+<div class="lg:col-span-2 space-y-lg">
+<section class="glass-card rounded-xl p-xl">
+<div class="flex items-center gap-sm mb-lg border-b border-white/5 pb-md">
+<span class="material-symbols-outlined text-primary">person</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Personal Information</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">First Name</label>
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" type="text" value="Alex"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Last Name</label>
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" type="text" value="Johnson"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Display Name</label>
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" type="text" value="Alex Johnson"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Username</label>
+<div class="relative">
+<span class="absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant">@</span>
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg pl-8 pr-md py-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" type="text" value="alexj"/>
+</div>
+</div>
+<div class="md:col-span-2 space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Bio</label>
+<textarea class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" rows="3">Senior Product Designer with a focus on enterprise information architecture and collaborative document systems. Based in Austin.</textarea>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Job Title</label>
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" type="text" value="Senior Product Designer"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Company</label>
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" type="text" value="SyncDocs"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Timezone</label>
+<select class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none">
+<option>Central Standard Time (CST)</option>
+<option>Eastern Standard Time (EST)</option>
+<option>Pacific Standard Time (PST)</option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Language</label>
+<select class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none">
+<option>English (US)</option>
+<option>English (UK)</option>
+<option>Spanish</option>
+<option>French</option>
+</select>
+</div>
+</div>
+</section>
+<!-- 3. ACCOUNT SECURITY -->
+<section class="glass-card rounded-xl p-xl">
+<div class="flex items-center gap-sm mb-lg border-b border-white/5 pb-md">
+<span class="material-symbols-outlined text-primary">security</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Account Security</h3>
+</div>
+<div class="space-y-md">
+<div class="flex items-center justify-between p-md bg-white/5 rounded-xl border border-white/5">
+<div class="flex gap-md items-center">
+<div class="p-sm bg-primary-container/20 rounded-lg">
+<span class="material-symbols-outlined text-primary">lock</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface">Password</h4>
+<p class="text-on-surface-variant text-[12px]">Last changed 3 months ago</p>
+</div>
+</div>
+<button class="px-md py-sm bg-surface border border-white/10 text-on-surface rounded-lg hover:bg-white/5 transition-colors font-label-md text-label-md">Change Password</button>
+</div>
+<div class="flex items-center justify-between p-md bg-white/5 rounded-xl border border-white/5">
+<div class="flex gap-md items-center">
+<div class="p-sm bg-green-500/10 rounded-lg">
+<span class="material-symbols-outlined text-green-500">verified_user</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface">Two-Factor Authentication</h4>
+<span class="text-[10px] bg-green-500/20 text-green-400 px-xs py-0.5 rounded font-bold uppercase tracking-tighter">Enabled</span>
+</div>
+</div>
+<button class="px-md py-sm bg-surface border border-white/10 text-on-surface rounded-lg hover:bg-white/5 transition-colors font-label-md text-label-md">Manage 2FA</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="p-md bg-white/5 rounded-xl border border-white/5 flex flex-col justify-between">
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface mb-xs">Recovery Codes</h4>
+<p class="text-on-surface-variant text-[12px] mb-md">Ensure you have saved codes for emergency access.</p>
+</div>
+<button class="w-full py-sm bg-surface border border-white/10 text-on-surface rounded-lg hover:bg-white/5 transition-colors font-label-md text-label-md">Generate New</button>
+</div>
+<div class="p-md bg-white/5 rounded-xl border border-white/5 flex flex-col justify-between">
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface mb-xs">Active Sessions</h4>
+<p class="text-on-surface-variant text-[12px] mb-md">3 devices currently logged in to your account.</p>
+</div>
+<button class="w-full py-sm bg-surface border border-white/10 text-on-surface rounded-lg hover:bg-white/5 transition-colors font-label-md text-label-md">View Sessions</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar Sections -->
+<div class="space-y-xl">
+<!-- 6. APPEARANCE -->
+<section class="glass-card rounded-xl p-xl">
+<h3 class="font-label-md text-label-md font-bold text-on-surface uppercase tracking-widest mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-sm">palette</span>
+              Appearance
+            </h3>
+<div class="space-y-lg">
+<div class="space-y-md">
+<label class="font-label-md text-label-md text-on-surface-variant">Theme Selection</label>
+<div class="grid grid-cols-2 gap-sm">
+<button class="flex flex-col items-center gap-sm p-md rounded-xl border-2 border-primary bg-primary/10 transition-all">
+<div class="w-full h-12 bg-[#0A0A0B] rounded-lg shadow-inner"></div>
+<span class="font-label-md text-label-md text-on-surface">Dark Mode</span>
+</button>
+<button class="flex flex-col items-center gap-sm p-md rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all opacity-50">
+<div class="w-full h-12 bg-white rounded-lg shadow-inner"></div>
+<span class="font-label-md text-label-md text-on-surface">Light Mode</span>
+</button>
+</div>
+</div>
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Accent Color</label>
+<div class="flex gap-md">
+<div class="w-8 h-8 rounded-full bg-[#6366F1] ring-4 ring-primary/20 cursor-pointer"></div>
+<div class="w-8 h-8 rounded-full bg-emerald-500 hover:scale-110 transition-transform cursor-pointer"></div>
+<div class="w-8 h-8 rounded-full bg-amber-500 hover:scale-110 transition-transform cursor-pointer"></div>
+<div class="w-8 h-8 rounded-full bg-rose-500 hover:scale-110 transition-transform cursor-pointer"></div>
+</div>
+</div>
+<div class="space-y-md pt-md border-t border-white/5">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface">Compact Mode</span>
+<div class="w-10 h-5 bg-white/10 rounded-full relative cursor-pointer">
+<div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface">Reduced Motion</span>
+<div class="w-10 h-5 bg-white/10 rounded-full relative cursor-pointer">
+<div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. CONNECTED ACCOUNTS -->
+<section class="glass-card rounded-xl p-xl">
+<h3 class="font-label-md text-label-md font-bold text-on-surface uppercase tracking-widest mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-sm">link</span>
+              Connected Accounts
+            </h3>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-md bg-white/5 rounded-xl group">
+<div class="flex gap-md items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-white rounded-lg">
+<img class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLSwx0G3YsXcTekfxjCfTWz85qdGJN0DM3bpDznnj80KmNwfaC0pU6HVQedqczL9R3TQbxc2fQM-KwCiVfCneeYCItJTbyg923-HGg3D_7wyornwjnkDMwqPOL1yAYzP6KT71M3NfSYumfXSKaFq1lzlXG8qgU4uns58tk9DP8uBr3zDjAnKN3qt_eT0dIS8V_p9aZ59Yo_tYCm2yeGtqnh78YR17syK8RplJ_uHIHu_PejrutxnhG"/>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface">Google</h4>
+<span class="text-[10px] text-green-500 font-bold">Connected</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-error opacity-0 group-hover:opacity-100 transition-opacity">logout</button>
+</div>
+<div class="flex items-center justify-between p-md bg-white/5 rounded-xl group">
+<div class="flex gap-md items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-[#181717] rounded-lg">
+<img class="w-5 h-5 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY3fVrPozQgFinxHRDOv2jIN1Su0p-ph4bgZ65pJXINw2mK3RMB5szl8bgw-o-GN3dXxeLuLL2zKM6G5RFPbh4kA5xMQbqoPmNyEfSW57cD4eAoCFdxC6suuw73fNi6fFQmkffRvy0EyMRDJD9bLRAi2YBOLhlCOBNSZFEs4AABEey-C-YCRk39ZrvvH6Fn4ylQjcKaPPBk6bRo3X5XTNEdezL2BbigbplUKuZS2nGGbpDGw5at7Ci"/>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface">GitHub</h4>
+<span class="text-[10px] text-green-500 font-bold">Connected</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-error opacity-0 group-hover:opacity-100 transition-opacity">logout</button>
+</div>
+<div class="flex items-center justify-between p-md bg-white/5 rounded-xl border border-white/5 border-dashed">
+<div class="flex gap-md items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">add</span>
+</div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface-variant">Microsoft</h4>
+</div>
+<button class="text-[10px] font-bold text-primary uppercase tracking-wider">Connect</button>
+</div>
+<div class="flex items-center justify-between p-md bg-white/5 rounded-xl border border-white/5 border-dashed">
+<div class="flex gap-md items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">add</span>
+</div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface-variant">Apple ID</h4>
+</div>
+<button class="text-[10px] font-bold text-primary uppercase tracking-wider">Connect</button>
+</div>
+</div>
+</section>
+<!-- 5. NOTIFICATION PREFERENCES -->
+<section class="glass-card rounded-xl p-xl">
+<h3 class="font-label-md text-label-md font-bold text-on-surface uppercase tracking-widest mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-sm">notifications_active</span>
+              Notifications
+            </h3>
+<div class="space-y-sm">
+<!-- Custom Toggle Items -->
+<div class="flex items-center justify-between p-sm bg-white/5 rounded-lg">
+<span class="font-body-sm text-body-sm text-on-surface">Email Notifications</span>
+<div class="w-10 h-5 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm bg-white/5 rounded-lg">
+<span class="font-body-sm text-body-sm text-on-surface">Desktop Push</span>
+<div class="w-10 h-5 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm bg-white/5 rounded-lg">
+<span class="font-body-sm text-body-sm text-on-surface">Mentions & Shares</span>
+<div class="w-10 h-5 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm bg-white/5 rounded-lg">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Weekly Digest</span>
+<div class="w-10 h-5 bg-white/10 rounded-full relative cursor-pointer">
+<div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm bg-white/5 rounded-lg">
+<span class="font-body-sm text-body-sm text-on-surface">Security Alerts</span>
+<div class="w-10 h-5 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- 8. DANGER ZONE -->
+<section class="bg-error-container/10 border border-error/20 rounded-xl p-xl">
+<h3 class="font-label-md text-label-md font-bold text-error uppercase tracking-widest mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm">warning</span>
+              Danger Zone
+            </h3>
+<div class="space-y-md">
+<div class="space-y-xs">
+<h4 class="font-label-md text-label-md font-bold text-on-surface">Deactivate Account</h4>
+<p class="text-on-surface-variant text-[12px]">Temporarily disable your profile. You can reactivate at any time.</p>
+<button class="w-full mt-sm py-sm border border-error/30 text-error rounded-lg hover:bg-error/10 transition-colors font-label-md text-label-md">Deactivate</button>
+</div>
+<div class="pt-md border-t border-error/10 space-y-xs">
+<h4 class="font-label-md text-label-md font-bold text-error">Delete Account</h4>
+<p class="text-on-surface-variant text-[12px]">Permanently remove your account and all associated document data. This cannot be undone.</p>
+<button class="w-full mt-sm py-sm bg-error-container text-on-error-container rounded-lg hover:bg-red-900 transition-colors font-label-md text-label-md font-bold">Delete Everything</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<!-- Padding for Scroll -->
+<div class="h-32"></div>
+</main>
+<script>
+    // Lightweight atmospheric effect: Glow follows cursor
+    const main = document.querySelector('main');
+    const glow = document.createElement('div');
+    glow.className = 'fixed w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none z-0';
+    document.body.appendChild(glow);
+
+    window.addEventListener('mousemove', (e) => {
+      glow.style.left = `${e.clientX - 192}px`;
+      glow.style.top = `${e.clientY - 192}px`;
+    });
+
+    // Toggle behavior simulation
+    document.querySelectorAll('.cursor-pointer').forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const knob = toggle.querySelector('div');
+        const isActive = toggle.classList.contains('bg-primary');
+        
+        if (isActive) {
+          toggle.classList.remove('bg-primary');
+          toggle.classList.add('bg-white/10');
+          knob.classList.remove('right-1');
+          knob.classList.add('left-1');
+        } else {
+          toggle.classList.remove('bg-white/10');
+          toggle.classList.add('bg-primary');
+          knob.classList.remove('left-1');
+          knob.classList.add('right-1');
+        }
+      });
+    });
+  </script>
+</body></html>

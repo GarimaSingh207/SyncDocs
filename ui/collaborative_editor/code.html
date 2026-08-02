@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SyncDocs | Collaborative Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#1000a9",
+                        "surface-container-low": "#1c1b1c",
+                        "outline-variant": "#464554",
+                        "on-tertiary-fixed": "#1b1b1f",
+                        "surface-container-highest": "#353436",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "inverse-surface": "#e5e2e3",
+                        "surface": "#131314",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "on-error": "#690005",
+                        "background": "#131314",
+                        "tertiary-container": "#919094",
+                        "on-tertiary": "#2f3034",
+                        "on-secondary-fixed": "#23005c",
+                        "tertiary-fixed-dim": "#c7c6ca",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "primary": "#c0c1ff",
+                        "primary-container": "#8083ff",
+                        "outline": "#908fa0",
+                        "on-tertiary-fixed-variant": "#46464a",
+                        "error": "#ffb4ab",
+                        "secondary": "#d0bcff",
+                        "on-surface": "#e5e2e3",
+                        "surface-dim": "#131314",
+                        "surface-container": "#201f20",
+                        "on-secondary": "#3c0091",
+                        "primary-fixed": "#e1e0ff",
+                        "tertiary-fixed": "#e3e2e6",
+                        "secondary-fixed": "#e9ddff",
+                        "on-error-container": "#ffdad6",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#0d0096",
+                        "on-surface-variant": "#c7c4d7",
+                        "on-background": "#e5e2e3",
+                        "tertiary": "#c7c6ca",
+                        "surface-container-lowest": "#0e0e0f",
+                        "inverse-primary": "#494bd6",
+                        "secondary-container": "#571bc1",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "surface-bright": "#3a393a",
+                        "surface-container-high": "#2a2a2b",
+                        "surface-tint": "#c0c1ff",
+                        "on-tertiary-container": "#292a2d",
+                        "on-primary-fixed": "#07006c",
+                        "on-secondary-container": "#c4abff",
+                        "inverse-on-surface": "#313031",
+                        "surface-variant": "#353436"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "container-max": "1440px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "unit": "8px",
+                        "margin-mobile": "16px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "mono-sm": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28.8px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "25.6px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "22.4px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "mono-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0B;
+            color: #e5e2e3;
+            overflow: hidden;
+            animation: fadeIn 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-panel {
+            background: rgba(19, 19, 20, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .cursor-collaborator {
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+            transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1), left 0.2s cubic-bezier(0.165, 0.84, 0.44, 1), top 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .cursor-caret {
+            width: 2px;
+            height: 22px;
+            animation: steadyBlink 1.2s infinite;
+        }
+
+        @keyframes steadyBlink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .sarah-cursor { border-left: 2px solid #ec4899; }
+        .alex-cursor { border-left: 2px solid #3b82f6; }
+        .rahul-cursor { border-left: 2px solid #22c55e; }
+
+        .sarah-label { background: #ec4899; }
+        .alex-label { background: #3b82f6; }
+        .rahul-label { background: #22c55e; }
+
+        .selection-sarah {
+            background: rgba(236, 72, 153, 0.15);
+            border-bottom: 2px solid rgba(236, 72, 153, 0.3);
+        }
+
+        .tab-active {
+            color: #c0c1ff;
+            border-bottom: 2px solid #c0c1ff;
+            transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .interaction-scale {
+            transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .interaction-scale:active { transform: scale(0.96); }
+
+        .avatar-pulse {
+            position: relative;
+        }
+        .avatar-pulse::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 9999px;
+            border: 2px solid currentColor;
+            opacity: 0;
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            80%, 100% { transform: scale(1.3); opacity: 0; }
+        }
+
+        .paper-surface {
+            background-color: rgba(250, 250, 250, 0.03);
+            border-radius: 4px;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.02);
+        }
+
+        .tooltip-trigger:hover .tooltip {
+            opacity: 1;
+            transform: translate(-50%, 0);
+            visibility: visible;
+        }
+
+        .tooltip {
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, 4px);
+            transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .typing-indicator span {
+            animation: typingBounce 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md flex h-screen overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface/80 backdrop-blur-2xl border-b border-white/5 shadow-md shadow-black/20">
+<div class="flex items-center gap-md">
+<span class="font-display text-headline-md font-bold text-primary tracking-tight">SyncDocs</span>
+<div class="h-4 w-[1px] bg-white/10 mx-sm"></div>
+<span class="font-label-md text-on-surface-variant/80">Project Odyssey Spec</span>
+</div>
+<div class="hidden md:flex items-center gap-sm px-md py-1.5 bg-white/[0.03] rounded-full border border-white/[0.05]">
+<span class="material-symbols-outlined text-primary text-[16px]">done_all</span>
+<span class="text-[11px] font-medium text-on-surface-variant/70 uppercase tracking-wider">Saved just now</span>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex -space-x-2 mr-md">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-gray-600 flex items-center justify-center overflow-hidden ring-2 ring-pink-500/10 avatar-pulse text-pink-500" title="Sarah">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a woman named Sarah with short hair, warm lighting, and a soft-focus office background, matching a clean tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3weEWDnuwScs7jxSOfMBMhaZd-rSIJDyNX0ICXN786sxeYohG5DVX1bZqEMKHXev9AJz3E_om12YDb-K5O3yUMsnz18VDQWYQUGe4vIkp17W77Dvyuo6gixfMMWdYZswoRyOMLyKBIijTM591w9b83Ri-JTlc5r3XyMzQmXsWJNH3utR7QjwsHv7k45mOe4EnN90Teoyo8uPWV3SZeBvygTvx40MFYT1ZeMbbHE-ynUTzeRr2HSvK"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-gray-600 flex items-center justify-center overflow-hidden ring-2 ring-blue-500/10 avatar-pulse text-blue-500" title="Alex">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a man named Alex wearing a minimal dark turtleneck, neutral studio lighting, focused expression, high-end digital agency style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDM7Doq84o4YiAvYqZiZqM9-a32eLNC5gdhOkp4v4XajJtONc-U4I0xbSdUGRQcKyjneWLaGoPwIroSnCG3oY-QG9JlHepQ5pwsg0ZKs9jhOaK2Uvsb2LkkWiZWtRshocXkpd55eiGzWG_DzUJYtW7inKSySgyVPikPdNNQkSrO2kGnJSj1VGgD8Ay985QUE74Von5UA4WtXiTSMiveZeTGdfiyOzjyoHi85mQ84SXyYqJcZzV4FYdN"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-gray-600 flex items-center justify-center overflow-hidden ring-2 ring-green-500/10 avatar-pulse text-green-500" title="Rahul">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a man named Rahul, smiling gently, outdoors with urban architectural background in soft focus, sunset lighting, tech professional vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiC9rrnMuNW6IhoCVIzE2WT55PBa96-wwxQ5FWSyI2_w9OGXuD36MU_llF_EwCs11qGnpbQIX96Pln4GFCtEME6vLETeFgIcCFmmmKqUMT-znRSWP_7hZ0nq1Dc0DCfaT4XOzm47EcIOQIC7Lxx95eiH7mhOe2OmlvfMm4G8_KwB_h_muH9OZXWcrk1yJnU7wF9r1RcLZ35qlkMSYoXu3ZiXAioq4QPNqSl-cLKHjIWOUWho8ZAqF0"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">+1</div>
+</div>
+<div class="flex items-center gap-xs">
+<button class="p-sm text-on-surface-variant hover:bg-white/10 hover:text-on-surface rounded-lg transition-all duration-200 material-symbols-outlined" title="History">history</button>
+<button class="p-sm text-on-surface-variant hover:bg-white/10 hover:text-on-surface rounded-lg transition-all duration-200 material-symbols-outlined" title="Notifications">notifications</button>
+<button class="p-sm text-on-surface-variant hover:bg-white/10 hover:text-on-surface rounded-lg transition-all duration-200 material-symbols-outlined" title="Settings">settings</button>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md hover:opacity-90 active:scale-95 transition-all interaction-scale ml-md">
+                Share
+            </button>
+</div>
+</header>
+<!-- Side Navigation (Collapsed State) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col py-lg w-[72px] bg-surface-container border-r border-white/5">
+<div class="flex flex-col items-center gap-sm flex-1">
+<button class="flex items-center justify-center w-12 h-12 bg-white/10 text-primary border-l-2 border-primary transition-all" title="Documents">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder</span>
+</button>
+<button class="flex items-center justify-center w-12 h-12 text-on-surface-variant transition-all hover:bg-white/5 hover:text-on-surface" title="Shared">
+<span class="material-symbols-outlined">group</span>
+</button>
+<button class="flex items-center justify-center w-12 h-12 text-on-surface-variant transition-all hover:bg-white/5 hover:text-on-surface" title="Starred">
+<span class="material-symbols-outlined">star</span>
+</button>
+<button class="flex items-center justify-center w-12 h-12 text-on-surface-variant transition-all hover:bg-white/5 hover:text-on-surface" title="Archived">
+<span class="material-symbols-outlined">inventory_2</span>
+</button>
+<div class="flex-1"></div>
+<button class="flex items-center justify-center w-12 h-12 text-on-surface-variant transition-all hover:bg-white/5 hover:text-on-surface" title="Help">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="flex items-center justify-center w-12 h-12 text-on-surface-variant transition-all hover:bg-white/5 hover:text-on-surface" title="Storage">
+<span class="material-symbols-outlined">cloud</span>
+</button>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 mt-16 ml-[72px] mr-[320px] flex flex-col relative bg-surface-container-lowest overflow-hidden">
+<!-- Floating Toolbar -->
+<div class="absolute top-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-sm px-lg py-2 glass-panel rounded-full shadow-2xl">
+<div class="relative tooltip-trigger">
+<button class="p-2 rounded-xl hover:bg-white/10 text-on-surface/80 hover:text-on-surface transition-all material-symbols-outlined text-[20px]">format_bold</button>
+<div class="tooltip absolute bottom-full left-1/2 mb-3 px-2 py-1 bg-surface-container-highest text-[10px] rounded text-on-surface whitespace-nowrap font-medium border border-white/10 shadow-xl">Bold ⌘B</div>
+</div>
+<div class="relative tooltip-trigger">
+<button class="p-2 rounded-xl hover:bg-white/10 text-on-surface/80 hover:text-on-surface transition-all material-symbols-outlined text-[20px]">format_italic</button>
+<div class="tooltip absolute bottom-full left-1/2 mb-3 px-2 py-1 bg-surface-container-highest text-[10px] rounded text-on-surface whitespace-nowrap font-medium border border-white/10 shadow-xl">Italic ⌘I</div>
+</div>
+<div class="relative tooltip-trigger">
+<button class="p-2 rounded-xl hover:bg-white/10 text-on-surface/80 hover:text-on-surface transition-all material-symbols-outlined text-[20px]">link</button>
+<div class="tooltip absolute bottom-full left-1/2 mb-3 px-2 py-1 bg-surface-container-highest text-[10px] rounded text-on-surface whitespace-nowrap font-medium border border-white/10 shadow-xl">Link ⌘K</div>
+</div>
+<div class="w-[1px] h-4 bg-white/10 mx-xs"></div>
+<div class="relative tooltip-trigger">
+<button class="p-2 rounded-xl hover:bg-white/10 text-on-surface/80 hover:text-on-surface transition-all material-symbols-outlined text-[20px]">format_list_bulleted</button>
+<div class="tooltip absolute bottom-full left-1/2 mb-3 px-2 py-1 bg-surface-container-highest text-[10px] rounded text-on-surface whitespace-nowrap font-medium border border-white/10 shadow-xl">List ⌘L</div>
+</div>
+<div class="relative tooltip-trigger">
+<button class="p-2 rounded-xl hover:bg-white/10 text-on-surface/80 hover:text-on-surface transition-all material-symbols-outlined text-[20px]">code</button>
+<div class="tooltip absolute bottom-full left-1/2 mb-3 px-2 py-1 bg-surface-container-highest text-[10px] rounded text-on-surface whitespace-nowrap font-medium border border-white/10 shadow-xl">Code ⌘E</div>
+</div>
+<div class="w-[1px] h-4 bg-white/10 mx-xs"></div>
+<button class="flex items-center gap-xs px-md py-1.5 rounded-xl hover:bg-white/10 text-on-surface-variant/90 hover:text-on-surface text-label-md transition-all">
+<span>Normal text</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+<!-- Document Canvas -->
+<div class="flex-1 overflow-y-auto no-scrollbar pt-32 pb-24 px-[5%]">
+<article class="max-w-[840px] mx-auto relative paper-surface p-xl">
+<!-- Collaborative Presence Layer -->
+<div class="absolute inset-0 pointer-events-none">
+<!-- Sarah's Cursor -->
+<div class="cursor-collaborator" style="top: 240px; left: 450px;">
+<div class="cursor-caret sarah-cursor"></div>
+<div class="sarah-label px-2 py-0.5 rounded-sm rounded-tl-none text-[10px] font-bold text-white shadow-lg">Sarah</div>
+</div>
+<!-- Alex's Cursor -->
+<div class="cursor-collaborator" style="top: 850px; left: 120px;">
+<div class="cursor-caret alex-cursor"></div>
+<div class="alex-label px-2 py-0.5 rounded-sm rounded-tl-none text-[10px] font-bold text-white shadow-lg">Alex</div>
+</div>
+<!-- Rahul's Cursor -->
+<div class="cursor-collaborator" style="top: 1100px; left: 380px;">
+<div class="cursor-caret rahul-cursor"></div>
+<div class="rahul-label px-2 py-0.5 rounded-sm rounded-tl-none text-[10px] font-bold text-white shadow-lg">Rahul</div>
+</div>
+</div>
+<h1 class="font-display text-display mb-lg leading-[1.2]">Project Odyssey: Technical Specification</h1>
+<p class="font-body-lg text-on-surface-variant mb-xl leading-[1.6]">
+                    This document outlines the architectural decisions and implementation strategies for the Odyssey data engine. 
+                    <span class="selection-sarah">Our goal is to achieve sub-50ms latency across globally distributed nodes while maintaining strict causal consistency models.</span>
+</p>
+<h2 class="font-headline-lg mb-md text-primary">Executive Summary</h2>
+<p class="font-body-md text-on-surface-variant mb-lg leading-[1.65]">
+                    The Odyssey engine leverages a multi-leader replication strategy with custom CRDT implementations to handle concurrent write operations. By decoupling the ingestion layer from the storage persistence, we can offer immediate consistency for local writes.
+                </p>
+<!-- Floating Inline Comment Bubble -->
+<div class="relative group">
+<p class="font-body-md text-on-surface-variant mb-lg border-l-2 border-white/10 pl-md italic leading-[1.65]">
+                        "The primary challenge remains the reconciliation of state across edge workers with limited compute budgets."
+                    </p>
+<button class="absolute -left-14 top-0 w-8 h-8 rounded-full glass-panel border border-primary/30 flex items-center justify-center text-primary hover:scale-110 transition-transform shadow-lg">
+<span class="material-symbols-outlined text-[18px]">add_comment</span>
+</button>
+</div>
+<h3 class="font-headline-md mb-sm mt-xl">Technical Stack</h3>
+<ul class="space-y-md mb-lg">
+<li class="flex items-start gap-md text-on-surface-variant">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="leading-relaxed">Next.js 14 (App Router) for the interface layer</span>
+</li>
+<li class="flex items-start gap-md text-on-surface-variant">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="leading-relaxed">Rust-based WASM modules for heavy data crunching</span>
+</li>
+<li class="flex items-start gap-md text-on-surface-variant">
+<span class="material-symbols-outlined text-outline">radio_button_unchecked</span>
+<span class="leading-relaxed">PostgreSQL with pgvector for semantic search indexing</span>
+</li>
+<li class="flex items-start gap-md text-on-surface-variant">
+<span class="material-symbols-outlined text-outline">radio_button_unchecked</span>
+<span class="leading-relaxed">Upstash Redis for real-time signaling and presence</span>
+</li>
+</ul>
+<div class="my-xl rounded-xl overflow-hidden border border-white/10 bg-surface-container-low shadow-2xl">
+<div class="bg-surface px-md py-xs border-b border-white/5 flex items-center justify-between">
+<span class="text-mono-sm text-on-surface-variant/70">init_engine.js</span>
+<span class="text-mono-sm text-outline/50">javascript</span>
+</div>
+<pre class="p-md text-mono-sm overflow-x-auto text-[#c0c1ff] leading-[1.6]"><span class="text-[#9393ff]">const</span> <span class="text-[#ffffff]">odyssey</span> = <span class="text-[#9393ff]">async</span> () =&gt; {
+  <span class="text-[#9393ff]">const</span> node = <span class="text-[#9393ff]">await</span> engine.<span class="text-[#ffffff]">initialize</span>({
+    region: <span class="text-secondary">'us-east-1'</span>,
+    persistence: <span class="text-secondary">'atomic'</span>,
+    strategy: <span class="text-secondary">'causal'</span>
+  });
+
+  <span class="text-outline">// Listen for remote mutations</span>
+  node.<span class="text-[#ffffff]">on</span>(<span class="text-secondary">'sync'</span>, (delta) =&gt; {
+    <span class="text-[#9393ff]">return</span> applyPatch(<span class="text-[#ffffff]">state</span>, delta);
+  });
+};</pre>
+</div>
+<div class="overflow-x-auto my-xl">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-white/10">
+<th class="pb-sm font-label-md text-outline font-bold uppercase tracking-wider text-[10px]">Feature</th>
+<th class="pb-sm font-label-md text-outline font-bold uppercase tracking-wider text-[10px]">Status</th>
+<th class="pb-sm font-label-md text-outline font-bold uppercase tracking-wider text-[10px]">Complexity</th>
+</tr>
+</thead>
+<tbody class="text-on-surface-variant font-body-sm">
+<tr class="border-b border-white/5">
+<td class="py-md">Vector Indexing</td>
+<td class="py-md"><span class="px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] uppercase font-bold">Done</span></td>
+<td class="py-md">Medium</td>
+</tr>
+<tr class="border-b border-white/5">
+<td class="py-md">Edge Middleware</td>
+<td class="py-md"><span class="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 text-[10px] uppercase font-bold">In Progress</span></td>
+<td class="py-md">High</td>
+</tr>
+<tr>
+<td class="py-md">Offline Sync</td>
+<td class="py-md"><span class="px-2 py-0.5 rounded-full bg-white/5 text-outline text-[10px] uppercase font-bold">Pending</span></td>
+<td class="py-md">Very High</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-xl h-12 flex items-center gap-sm">
+<div class="relative flex items-center justify-center w-3 h-3">
+<div class="absolute w-full h-full bg-pink-500 rounded-full animate-ping opacity-20"></div>
+<div class="w-2 h-2 bg-pink-500 rounded-full"></div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-label-md text-pink-500 font-medium">Sarah is typing</span>
+<div class="typing-indicator flex gap-1 items-center h-full pt-1">
+<span class="w-1 h-1 bg-pink-500 rounded-full opacity-60"></span>
+<span class="w-1 h-1 bg-pink-500 rounded-full opacity-60"></span>
+<span class="w-1 h-1 bg-pink-500 rounded-full opacity-60"></span>
+</div>
+</div>
+</div>
+</article>
+</div>
+<!-- Status Bar -->
+<footer class="h-10 bg-surface px-lg border-t border-white/5 flex items-center justify-between z-30">
+<div class="flex items-center gap-lg">
+<span class="text-[11px] font-medium text-outline/60 uppercase tracking-wider">1,248 words</span>
+<span class="text-[11px] font-medium text-outline/60 uppercase tracking-wider">Reading time: 5 min</span>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-xs">
+<div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+<span class="text-[11px] font-medium text-outline/80 uppercase tracking-wider">Latency: 12ms</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+<span class="text-[11px] font-medium text-on-surface uppercase tracking-wider">Autosave: On</span>
+</div>
+</div>
+</footer>
+</main>
+<!-- Right Side Panel -->
+<aside class="fixed right-0 top-16 h-[calc(100vh-64px)] w-[320px] bg-surface-container border-l border-white/5 flex flex-col z-40">
+<div class="flex px-md border-b border-white/5">
+<button class="flex-1 py-md text-label-md font-bold text-center tab-active">Comments</button>
+<button class="flex-1 py-md text-label-md font-bold text-center text-outline/70 hover:text-on-surface transition-all">Activity</button>
+<button class="flex-1 py-md text-label-md font-bold text-center text-outline/70 hover:text-on-surface transition-all">Outline</button>
+</div>
+<div class="flex-1 overflow-y-auto no-scrollbar p-md space-y-xl">
+<!-- Threaded Discussion -->
+<div class="space-y-md">
+<div class="flex items-center justify-between mb-xs">
+<span class="text-label-md text-primary font-bold tracking-tight">API Endpoints Discussion</span>
+<span class="text-[10px] font-medium text-outline/50 uppercase tracking-wider">2h ago</span>
+</div>
+<div class="glass-panel p-md rounded-xl space-y-md border-l-4 border-l-primary/30 bg-primary/[0.02]">
+<div class="flex gap-sm">
+<div class="w-8 h-8 rounded-full bg-gray-700 overflow-hidden shrink-0 ring-1 ring-white/10">
+<img class="w-full h-full object-cover" data-alt="Close up avatar of a woman with pink tinted glasses and modern hair style, looking directly at the camera, clean professional look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrDaG-FWEZ9_0VknfEhzatsh1Ti5GDKmpxK2fqk0cQ6hj5xEzEFqdYQx7xdgoOll-M8SyUIBdOKS937-1L76AF3fKUFYeJ9xbPWjVJ7_h2rPLd8d7bHjiCRTiC5f8HRh08-VSYahT8UhCzw5hn5h1PMPI3fonahJB0ccQpPnwsTWarTy9T8FKbvx_IiQNR59Pp3MF4kvUtdgFuC7mnaC_7RmqRt7ZyjTzUvAoxVz4hlSyy4QZY5Y0h"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="text-label-md font-bold text-on-surface">Sarah</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-1 leading-relaxed">Should we move the /v1/auth prefix to /v1/identity? It feels more aligned with our new IAM strategy.</p>
+</div>
+</div>
+<div class="flex gap-sm pl-md border-l border-white/10 ml-4">
+<div class="w-8 h-8 rounded-full bg-gray-700 overflow-hidden shrink-0 ring-1 ring-white/10">
+<img class="w-full h-full object-cover" data-alt="Close up avatar of a man with minimalist glasses and short dark hair, tech startup co-founder aesthetic, serious but friendly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJF1OR_LRxOH5FAsyAlUzleauVFZ6qfjvVUf-mt3syDpPOlMtHUWpTn81n5rnOFomHQUEn_8bEr86Q4rDmV2G3E5LRFjIf8psF4glvigmnMcqlX0iMdu7aaN1Bocfti0YrT0jkLH88x_uufHUm5ww4uNTGQO1P5L_UPrsGRG33V5OGKJzayth8dmSRRZ5jIhsTgYv2TR8go1viejl-ngPvjjSUqnGbUELHPAnaNeabSo58fvjybLzD"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="text-label-md font-bold text-on-surface">Alex</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-1 leading-relaxed">Agreed. I'll update the OpenAPI spec tomorrow morning. Also, Rahul needs to check the migration script.</p>
+</div>
+</div>
+</div>
+<div class="mt-sm">
+<input class="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-md py-2.5 text-body-sm focus:ring-1 focus:ring-primary focus:border-primary/50 transition-all outline-none placeholder:text-outline/40 shadow-inner" placeholder="Reply to thread..." type="text"/>
+</div>
+</div>
+<!-- Outline Preview -->
+<div class="pt-8">
+<h4 class="text-[10px] font-bold text-outline/50 mb-md uppercase tracking-[0.2em]">Document Outline</h4>
+<div class="space-y-4">
+<a class="flex items-center gap-3 text-body-sm text-primary font-bold hover:translate-x-1 transition-transform" href="#">
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+    Project Odyssey
+</a>
+<a class="flex items-center gap-3 text-body-sm text-on-surface-variant/80 pl-4 hover:text-on-surface hover:translate-x-1 transition-all" href="#">
+<span class="w-1 h-1 bg-white/10 rounded-full"></span>
+    Executive Summary
+</a>
+<a class="flex items-center gap-3 text-body-sm text-on-surface-variant/80 pl-4 hover:text-on-surface hover:translate-x-1 transition-all" href="#">
+<span class="w-1 h-1 bg-white/10 rounded-full"></span>
+    Technical Stack
+</a>
+<a class="flex items-center gap-3 text-body-sm text-on-surface-variant/60 pl-10 hover:text-on-surface hover:translate-x-1 transition-all" href="#">
+<span class="w-1 h-[1px] bg-white/10"></span>
+    Data Engine Architecture
+</a>
+<a class="flex items-center gap-3 text-body-sm text-on-surface-variant/60 pl-10 hover:text-on-surface hover:translate-x-1 transition-all" href="#">
+<span class="w-1 h-[1px] bg-white/10"></span>
+    Consistency Models
+</a>
+</div>
+</div>
+</div>
+<div class="p-md border-t border-white/5 bg-surface-container-high">
+<button class="w-full flex items-center justify-center gap-sm px-md py-sm bg-white/5 hover:bg-white/10 rounded-xl text-label-md font-bold transition-all border border-white/5 hover:border-white/10">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>New Comment</span>
+</button>
+</div>
+</aside>
+<script>
+        // Smooth Micro-interactions
+        document.addEventListener('DOMContentLoaded', () => {
+            const sarah = document.querySelector('.cursor-collaborator:nth-child(1)');
+            const alex = document.querySelector('.cursor-collaborator:nth-child(2)');
+            const rahul = document.querySelector('.cursor-collaborator:nth-child(3)');
+
+            const updateCursors = () => {
+                const time = Date.now();
+                if(sarah) {
+                    sarah.style.left = `${450 + Math.sin(time/2000)*40}px`;
+                    sarah.style.top = `${240 + Math.cos(time/2500)*25}px`;
+                }
+                if(alex) {
+                    alex.style.left = `${120 + Math.cos(time/3000)*60}px`;
+                    alex.style.top = `${850 + Math.sin(time/1500)*30}px`;
+                }
+                requestAnimationFrame(updateCursors);
+            };
+            requestAnimationFrame(updateCursors);
+        });
+
+        // Tab switching logic
+        const tabs = document.querySelectorAll('aside[class*="right-0"] .flex.px-md button');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('tab-active', 'text-on-surface'));
+                tabs.forEach(t => t.classList.add('text-outline/70'));
+                tab.classList.add('tab-active');
+                tab.classList.remove('text-outline/70');
+            });
+        });
+    </script>
+</body></html>

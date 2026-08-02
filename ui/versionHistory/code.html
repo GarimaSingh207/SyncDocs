@@ -1,0 +1,510 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>SyncDocs | Version History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#919094",
+                        "on-primary-container": "#0d0096",
+                        "on-tertiary-fixed": "#1b1b1f",
+                        "on-secondary-container": "#c4abff",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "on-secondary": "#3c0091",
+                        "tertiary-fixed-dim": "#c7c6ca",
+                        "outline": "#908fa0",
+                        "inverse-on-surface": "#313031",
+                        "surface-dim": "#131314",
+                        "secondary-container": "#571bc1",
+                        "surface": "#131314",
+                        "primary-container": "#8083ff",
+                        "surface-variant": "#353436",
+                        "on-tertiary-fixed-variant": "#46464a",
+                        "surface-container-high": "#2a2a2b",
+                        "error": "#ffb4ab",
+                        "surface-container": "#201f20",
+                        "inverse-primary": "#494bd6",
+                        "surface-container-low": "#1c1b1c",
+                        "primary-fixed": "#e1e0ff",
+                        "background": "#131314",
+                        "surface-container-lowest": "#0e0e0f",
+                        "on-surface": "#e5e2e3",
+                        "secondary-fixed": "#e9ddff",
+                        "outline-variant": "#464554",
+                        "surface-bright": "#3a393a",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "surface-tint": "#c0c1ff",
+                        "primary": "#c0c1ff",
+                        "on-tertiary-container": "#292a2d",
+                        "tertiary": "#c7c6ca",
+                        "inverse-surface": "#e5e2e3",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-secondary-fixed": "#23005c",
+                        "surface-container-highest": "#353436",
+                        "on-primary-fixed": "#07006c",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#e3e2e6",
+                        "on-tertiary": "#2f3034",
+                        "on-background": "#e5e2e3",
+                        "on-surface-variant": "#c7c4d7",
+                        "on-primary": "#1000a9",
+                        "secondary": "#d0bcff",
+                        "primary-fixed-dim": "#c0c1ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "unit": "8px",
+                        "md": "16px",
+                        "container-max": "1440px",
+                        "sm": "8px",
+                        "xl": "32px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "mono-sm": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "display": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "mono-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0B;
+            color: #e5e2e3;
+            overflow-x: hidden;
+        }
+        .glass {
+            background: rgba(19, 20, 23, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .diff-added {
+            background-color: rgba(34, 197, 94, 0.15);
+            text-decoration: underline;
+            text-decoration-color: rgba(34, 197, 94, 0.4);
+        }
+        .diff-removed {
+            background-color: rgba(239, 68, 68, 0.15);
+            text-decoration: line-through;
+            color: #ef4444;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .active-pill {
+            position: relative;
+        }
+        .active-pill::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 25%;
+            bottom: 25%;
+            width: 2px;
+            background-color: #c0c1ff;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md selection:bg-primary/30 selection:text-white">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 dark:bg-surface/70 backdrop-blur-xl border-b border-white/10 shadow-sm flex items-center justify-between px-lg h-16 w-full">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-primary">SyncDocs</span>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors duration-200 px-3 py-1 rounded-lg" href="#">Editor</a>
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1" href="#">History</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors duration-200 px-3 py-1 rounded-lg" href="#">Insights</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors duration-200 px-3 py-1 rounded-lg" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface transition-colors cursor-pointer p-2 rounded-full hover:bg-white/5">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer p-2 rounded-full hover:bg-white/5">help</span>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-lg active:scale-95 transition-transform duration-150 shadow-lg shadow-primary/20">Share</button>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A professional close-up headshot of a person with a friendly expression, captured with shallow depth of field against a minimalist dark studio background. The lighting is soft and cinematic, highlighting facial features clearly, fitting a high-end enterprise software user profile aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGYO9TIP-bh9e-UJ-tvVjH29tk7N1GsXZ6fA513iFyXF8KWoGn6z8fq2YsQ-rmONPq7oUQwoYXO9A5pc1nrRAKjxvxLnQok6xti9lb93CxXx8dWU54qkksYcbnpn9GB2gHmQmv5p3-OyszQYRfpotj3cMJ4wM3UdFQszImXR4GmeI7lVX7V3hq6SMGkV4WTXPnsv_9WnGx6876Edh1ejZKSzKDL0ANpNn7sX1mgg-rm6RPp9IbUWkL">
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-[280px] bg-surface dark:bg-surface border-r border-white/5 flex flex-col py-lg z-40">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-md mb-xs">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">history</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Version Control</h3>
+<p class="text-on-surface-variant font-label-md text-label-md opacity-70">Collaborative Editor</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto custom-scrollbar">
+<div class="flex flex-col">
+<a class="flex items-center gap-md bg-secondary-container/20 text-primary border-l-2 border-primary px-lg py-md hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">All Versions</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-lg py-md hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-md text-label-md">Major Edits</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-lg py-md hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">save</span>
+<span class="font-label-md text-label-md">Autosaves</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-lg py-md hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">star</span>
+<span class="font-label-md text-label-md">Starred</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-lg py-md hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Shared with Me</span>
+</a>
+</div>
+</nav>
+<div class="mt-auto px-lg pt-md border-t border-white/5">
+<div class="flex flex-col gap-xs mb-md">
+<a class="flex items-center gap-md text-on-surface-variant py-sm hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-body-md">delete</span>
+<span class="font-label-md text-label-md">Trash</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant py-sm hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-body-md">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<button class="w-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md py-md rounded-xl border border-white/10 transition-colors flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">archive</span>
+                Export Archive
+            </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-[280px] pt-16 h-screen flex">
+<!-- Center Workspace Area -->
+<div class="flex-1 flex flex-col min-w-0 bg-background">
+<!-- Page Header -->
+<div class="px-xl py-lg border-b border-white/5 flex items-center justify-between mb-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Version History</h1>
+<p class="text-on-surface-variant font-body-sm text-body-sm mt-1 opacity-60">Browse, compare and restore previous versions of your document</p>
+</div>
+<div class="flex items-center gap-md">
+<button class="flex items-center gap-sm text-on-surface-variant hover:text-on-surface px-md py-sm rounded-lg hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+<span class="font-label-md text-label-md">Duplicate Version</span>
+</button>
+<button class="flex items-center gap-sm text-on-surface-variant hover:text-on-surface px-md py-sm rounded-lg hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+<span class="font-label-md text-label-md">Export Snapshot</span>
+</button>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-xl py-sm rounded-lg shadow-xl shadow-primary/10 active:scale-95 transition-transform">
+                        Restore Version
+                    </button>
+</div>
+</div>
+<!-- Filters Bar -->
+<div class="px-xl py-2 border-b border-white/5 flex items-center justify-between glass sticky top-0 z-10">
+<div class="flex items-center gap-lg">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="bg-surface-container-low border border-white/10 rounded-lg pl-10 pr-md w-64 text-body-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none py-1.5" placeholder="Search versions..." type="text">
+</div>
+<div class="h-6 w-px bg-white/10 mx-2"></div>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-sm py-1.5 rounded-md hover:bg-white/5 text-on-surface-variant font-label-md text-label-md transition-all">
+<span class="material-symbols-outlined text-[18px]">person</span>
+                            Editor
+                            <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<button class="flex items-center gap-xs px-sm py-1.5 rounded-md hover:bg-white/5 text-on-surface-variant font-label-md text-label-md transition-all">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                            Date
+                            <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+</div>
+<div class="flex items-center bg-surface-container-lowest rounded-lg p-1 border border-white/5">
+<button class="px-md py-1.5 rounded-md text-label-md font-label-md bg-surface-variant text-on-surface shadow-sm transition-all">Auto Saves</button>
+<button class="px-md py-1.5 rounded-md text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-all">Manual Saves</button>
+</div>
+</div>
+<!-- Dashboard / Preview Grid -->
+<div class="flex-1 overflow-hidden flex items-stretch">
+<!-- Timeline Scroll (Left side of center area) -->
+<div class="w-[380px] border-r border-white/5 flex flex-col">
+<div class="flex-1 overflow-y-auto custom-scrollbar p-md space-y-xl"><!-- Card 1 (Active) -->
+<div class="relative pl-6 mb-xl">
+<div class="absolute left-[3px] top-4 w-1.5 h-1.5 rounded-full bg-primary ring-4 ring-primary/20"></div>
+<div class="absolute left-[7px] top-8 bottom-0 w-px bg-white/5" style="width: 1px;"></div>
+<div class="bg-surface-container-high border-2 border-primary/40 rounded-xl p-md shadow-2xl shadow-primary/10 transform scale-[1.02] transition-all duration-200 cursor-pointer">
+<div class="flex items-center justify-between mb-sm">
+<span class="text-[10px] font-label-md text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Manual Save</span>
+<span class="font-label-md text-label-md text-on-surface-variant">4:42 PM</span>
+</div>
+<h4 class="font-body-md text-body-md font-semibold text-on-surface">Updated API Documentation</h4>
+<div class="flex items-center gap-sm mt-sm">
+<div class="w-5 h-5 rounded-full bg-surface-variant overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBH76mrQ8mmwVctzI_j38k04_KUV4zKlpZ50vyu-DfmEBKOcYDU3mxt8Hn3ecaoOTCoVa9IBkLwrhQ2WF7W04rsbv0dfmYR3aEOm6REOD2Wc1JWAoCjt1baJ4UN8EjIq9dJygkjz-dSJjvn7S2NtxSA-cGN5b7Q8y9eMm_iqUr72A0vnRKcIGSIyjtEW_LSXMEdsSo-ZiKxA5AC2UFZaeUdNpMYB3PDV2n9ril5xsrpnlvXgywW7Mv">
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Sarah Mitchell</span>
+</div>
+<div class="mt-md rounded-lg border border-white/5 overflow-hidden h-24 relative">
+<img class="w-full h-full object-cover opacity-50 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAnznTfpuSzTGwRLtdSEiYNDgKS_AdmHvD0taAocPeIOlfDixgdz3_aarJX4RwBCls7nTtd5LvE7HCA1_sw0ZgEzBAZYwRfR-y2JZKnnHQdxstwYW9gJjhVs0nFobW3_AR7mMi2l_tk3_XOpRZGrKCxQmU-rNDVDBb9ok1RgZiJQ_ZkAvovLtGzGE2AI7z7xqMRef1nJRwOShVqNSp_Ttc7N1eShNTDbBuVfF53g3UadfesuKsKbS4">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-high to-transparent"></div>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-sm leading-snug line-clamp-2">Fixed the authentication endpoint parameters and added missing schema descriptions for the webhook events.</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="relative pl-6 mb-xl">
+<div class="absolute left-[3px] top-4 w-1.5 h-1.5 rounded-full bg-white/20"></div>
+<div class="absolute left-[7px] top-8 bottom-0 w-px bg-white/5" style="width: 1px;"></div>
+<div class="bg-surface-container hover:bg-surface-container-high border border-white/5 rounded-xl p-md transition-all duration-200 cursor-pointer group">
+<div class="flex items-center justify-between mb-sm">
+<span class="text-[10px] font-label-md text-on-surface-variant bg-white/5 px-2 py-0.5 rounded-full uppercase tracking-wider">Auto Save</span>
+<span class="font-label-md text-label-md text-on-surface-variant">2:10 PM</span>
+</div>
+<h4 class="font-body-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Added authentication flow</h4>
+<div class="flex items-center gap-sm mt-sm">
+<div class="w-5 h-5 rounded-full bg-surface-variant overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYFVqygg_DKI2em8L8ABaLuPqrMoU8K1GLBaXZ70pQjBz3DA4z5bTZWJ3PqTzLbKBThc8_C1U75bFZOA4r4EMPmmchrDHGsTav--jJZdT8rg9EBxcLuiBKXiQ4Lp4ApumusIz3izgJTxG5pQPfAUeiDiq2jr2TZQrIQUgqJXbtj_jyuiu5H1kuy1tFDfVEERbxlLPaf7o_0q1-pXwHqDcWfjsnfZp27mg5uwQM5e2guWa2dC_rwKHr">
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Alex Rivera</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="relative pl-6">
+<div class="absolute left-[3px] top-4 w-1.5 h-1.5 rounded-full bg-white/20"></div>
+<div class="bg-surface-container hover:bg-surface-container-high border border-white/5 rounded-xl p-md transition-all duration-200 cursor-pointer group">
+<div class="flex items-center justify-between mb-sm">
+<span class="text-[10px] font-label-md text-on-surface-variant bg-white/5 px-2 py-0.5 rounded-full uppercase tracking-wider">Manual Save</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Yesterday</span>
+</div>
+<h4 class="font-body-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Resolved review comments</h4>
+<div class="flex items-center gap-sm mt-sm">
+<div class="w-5 h-5 rounded-full bg-surface-variant overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAm3G5R7WSKL8aev3eNk5F-OMPu6s8fZlNloN-h6XC8hYiv3FO7WJBObIiHYVFH4V_MhEDfO8nMFXwjjLGnhQ7TXHSOiGnGNBGSxD0MvwvC1lel33uiS9SYA-b-wtftwEMcndiWlj0u10K49pVAL5rEfJxQiWc4lYOqdd7ErvIceKhthq3YrBXFXdW-1W7tepLKC8ZhGm5H_8_xsSVqIcyzsDrySkHFQpeAfRh_9SRqcB-RkpNKTbG">
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Emma Watson</span>
+</div>
+</div>
+</div></div>
+</div>
+<!-- Document Preview Area (Center) -->
+<div class="flex-1 bg-surface-container-lowest flex flex-col p-lg overflow-y-auto custom-scrollbar">
+<div class="max-w-4xl mx-auto w-full glass rounded-2xl p-xl shadow-2xl bg-white/[0.03] text-[18px] max-w-none border border-white/10 transition-all duration-200">
+<div class="flex items-center justify-between mb-xl border-b border-white/5 pb-md">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">description</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">api-docs-v2.md</span>
+</div>
+<div class="flex gap-xs">
+<span class="w-2 h-2 rounded-full bg-red-500/20 border border-red-500/40"></span>
+<span class="w-2 h-2 rounded-full bg-yellow-500/20 border border-yellow-500/40"></span>
+<span class="w-2 h-2 rounded-full bg-green-500/20 border border-green-500/40"></span>
+</div><div class="ml-md px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Read Only Preview</div>
+</div>
+<article class="prose prose-invert max-w-none"><h2 class="font-headline-md text-headline-md text-on-surface mb-md">API Endpoints</h2>
+<p class="mb-md text-on-surface/80">The following endpoints are used to interact with the SyncDocs synchronization engine. <span class="bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded transition-colors duration-200">All requests must include a valid Bearer token in the Authorization header.</span></p>
+<div class="flex gap-lg font-mono-sm text-mono-sm">
+<div class="w-full bg-surface-container-low rounded-lg p-md border border-white/5 space-y-2 font-mono-sm">
+<div class="flex justify-between border-b border-white/5 pb-sm mb-sm text-on-surface-variant/60">
+<span class="">Current Version</span>
+<span class="">4:42 PM</span>
+</div>
+<div class="text-on-surface/90">
+<p class=""><span class="text-primary font-bold">GET</span> /v1/documents</p>
+<p class="bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded inline-block mt-1">Returns a list of all accessible documents for the authenticated user, including metadata and last-edit timestamps.</p>
+<p class="mt-4"><span class="text-primary font-bold">POST</span> /v1/documents/sync</p>
+<p class="">Synchronizes local changes with the remote server. <span class="bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded line-through">Note: max payload size is 5MB.</span> <span class="bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded">Update: max payload size increased to 25MB for enterprise tiers.</span></p>
+</div>
+</div>
+</div>
+<div class="mt-xl">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Webhook Events</h3>
+<p class="text-on-surface/80">Configure webhooks to receive real-time notifications about document lifecycle events.</p>
+<div class="grid grid-cols-2 gap-md mt-md">
+<div class="p-md rounded-xl bg-surface-container-high border border-white/10 hover:bg-surface-variant transition-colors duration-200">
+<div class="flex items-center justify-between mb-sm">
+<span class="font-label-md text-label-md font-bold text-on-surface">document.created</span>
+<span class="material-symbols-outlined text-green-400 text-sm">add_circle</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Triggered whenever a new document is successfully initialized.</p>
+</div>
+<div class="p-md rounded-xl bg-surface-container-high border border-white/10 opacity-60 hover:bg-surface-variant transition-colors duration-200">
+<div class="flex items-center justify-between mb-sm">
+<span class="font-label-md text-label-md font-bold text-on-surface line-through">document.deleted</span>
+<span class="material-symbols-outlined text-red-400 text-sm">remove_circle</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">This event has been deprecated in favor of document.archived.</p>
+</div>
+</div>
+</div></article>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Panels: Version Details -->
+<aside class="w-[320px] bg-surface border-l border-white/5 flex flex-col">
+<div class="p-lg border-b border-white/5">
+<h2 class="font-headline-md text-headline-md text-on-surface">Version Details</h2>
+<p class="text-on-surface-variant font-label-md text-label-md">Snapshot ID: #SD-4492-AX</p>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-lg space-y-[48px]"><!-- Metadata Section -->
+<section class="mb-xl">
+<h3 class="text-on-surface-variant/50 font-label-md text-[10px] uppercase tracking-widest mb-lg">Attributes</h3>
+<div class="space-y-lg">
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-body-sm text-body-sm opacity-40">Editor</span>
+<div class="flex items-center gap-sm">
+<img class="w-5 h-5 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcqAoC_GEqUfP-QNX_VewcKKiaOevDgnCXYX5YPnQrhLLGLIgaJhMu6TusHSCRZ-sTKeRJKB6Per4nwRVvMNsMMFChYy5QR8XP_nbYgS11QwkoWJxUyB_F66zvVc-Pt-4WS26Hgb_-OFr5V25JEU9TGIL7qGc9EJuhzPi9MqTW-fhbly5yeRcHkaGVXmqGPb97u-27mq1D5_Qxm6gHvoTTYYuugBvJMw1AeWz9EUpqsvsuI90Xaob1">
+<span class="text-on-surface font-body-sm text-body-sm font-semibold">Sarah Mitchell</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-body-sm text-body-sm opacity-40">Time</span>
+<span class="text-on-surface font-body-sm text-body-sm font-semibold">4:42:15 PM</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-body-sm text-body-sm opacity-40">Device</span>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm opacity-40">laptop_mac</span>
+<span class="text-on-surface font-body-sm text-body-sm font-semibold">MacBook Pro</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-body-sm text-body-sm opacity-40">Browser</span>
+<span class="text-on-surface font-body-sm text-body-sm font-semibold">Chrome v124</span>
+</div>
+</div>
+</section>
+<!-- Statistics Section -->
+<section class="mb-xl">
+<h3 class="text-on-surface-variant/50 font-label-md text-[10px] uppercase tracking-widest mb-lg">Changes</h3>
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-surface-container-high p-md rounded-xl border border-white/5">
+<p class="text-green-400 font-headline-md text-headline-md font-bold">+245</p>
+<p class="text-on-surface-variant/60 font-label-md text-label-md">Words Added</p>
+</div>
+<div class="bg-surface-container-high p-md rounded-xl border border-white/5">
+<p class="text-red-400 font-headline-md text-headline-md font-bold">-12</p>
+<p class="text-on-surface-variant/60 font-label-md text-label-md">Removed</p>
+</div>
+<div class="bg-surface-container-high p-md rounded-xl border border-white/5 col-span-2 flex items-center justify-between">
+<div>
+<p class="text-on-surface font-headline-md text-headline-md font-bold">3</p>
+<p class="text-on-surface-variant/60 font-label-md text-label-md">Comments</p>
+</div>
+<span class="material-symbols-outlined text-primary">chat_bubble</span>
+</div>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="space-y-md">
+<h3 class="text-on-surface-variant/50 font-label-md text-[10px] uppercase tracking-widest mb-lg">Actions</h3>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-md rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:bg-primary/90 active:scale-95 transition-all duration-200 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">settings_backup_restore</span>
+Restore to Current
+</button>
+<p class="text-[11px] text-on-surface-variant opacity-40 mt-2 text-center px-2">Restoring this version creates a new version rather than overwriting history.</p>
+<button class="w-full bg-surface-container-high hover:bg-surface-variant text-on-surface font-label-md text-label-md py-md rounded-xl border border-white/10 transition-all duration-200 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">difference</span>
+Compare with Previous
+</button>
+<button class="w-full bg-surface-container-high hover:bg-surface-variant text-on-surface font-label-md text-label-md py-md rounded-xl border border-white/10 transition-all duration-200 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">star</span>
+Mark as Milestone
+</button>
+</section></div>
+<div class="p-lg bg-surface-container-low border-t border-white/5">
+<div class="flex items-center gap-md">
+<div class="p-2 bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary">security</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Encryption Verified</p>
+<p class="text-body-sm text-on-surface-variant opacity-70">Snapshot hash matches</p>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- Floating Toast Example (Micro-interaction) -->
+<div class="fixed bottom-lg left-1/2 -translate-x-1/2 bg-surface-container-highest border border-primary/40 rounded-full px-xl py-md shadow-2xl flex items-center gap-md transition-all duration-300 opacity-0 translate-y-10 z-[100] pointer-events-none" id="toast">
+<span class="material-symbols-outlined text-primary">check_circle</span>
+<span class="font-label-md text-label-md text-on-surface">Comparing Version SD-4492 with SD-4491</span>
+</div>
+<script>
+        // Simple interaction simulation
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.cursor-pointer');
+            const toast = document.getElementById('toast');
+
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Visual feedback
+                    toast.style.opacity = '1';
+                    toast.style.transform = 'translate(-50%, 0)';
+                    
+                    setTimeout(() => {
+                        toast.style.opacity = '0';
+                        toast.style.transform = 'translate(-50%, 10px)';
+                    }, 3000);
+                });
+            });
+        });
+    </script>
+
+
+
+
+</body></html>

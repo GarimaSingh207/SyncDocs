@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SyncDocs Pro - Share &amp; Permissions</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#1b1b1f",
+                    "surface-container-low": "#1c1b1c",
+                    "on-secondary-fixed-variant": "#5516be",
+                    "tertiary-fixed-dim": "#c7c6ca",
+                    "on-secondary-container": "#c4abff",
+                    "on-secondary": "#3c0091",
+                    "surface-container-highest": "#353436",
+                    "secondary-container": "#571bc1",
+                    "on-surface-variant": "#c7c4d7",
+                    "inverse-surface": "#e5e2e3",
+                    "on-primary-fixed": "#07006c",
+                    "tertiary-container": "#919094",
+                    "error": "#ffb4ab",
+                    "primary-fixed-dim": "#c0c1ff",
+                    "tertiary-fixed": "#e3e2e6",
+                    "on-surface": "#e5e2e3",
+                    "secondary-fixed-dim": "#d0bcff",
+                    "tertiary": "#c7c6ca",
+                    "outline-variant": "#464554",
+                    "inverse-on-surface": "#313031",
+                    "primary-fixed": "#e1e0ff",
+                    "on-secondary-fixed": "#23005c",
+                    "surface-bright": "#3a393a",
+                    "on-primary-fixed-variant": "#2f2ebe",
+                    "on-background": "#e5e2e3",
+                    "surface-container": "#201f20",
+                    "secondary": "#d0bcff",
+                    "outline": "#908fa0",
+                    "primary-container": "#8083ff",
+                    "on-error": "#690005",
+                    "surface-tint": "#c0c1ff",
+                    "on-tertiary-fixed-variant": "#46464a",
+                    "secondary-fixed": "#e9ddff",
+                    "background": "#131314",
+                    "on-tertiary-container": "#292a2d",
+                    "surface-variant": "#353436",
+                    "on-tertiary": "#2f3034",
+                    "inverse-primary": "#494bd6",
+                    "surface-dim": "#131314",
+                    "surface-container-high": "#2a2a2b",
+                    "primary": "#c0c1ff",
+                    "on-primary": "#1000a9",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-lowest": "#0e0e0f",
+                    "surface": "#131314",
+                    "on-primary-container": "#0d0096",
+                    "error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "container-max": "1440px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "unit": "8px",
+                    "margin-mobile": "16px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "display": ["Inter"],
+                    "mono-sm": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "mono-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0B;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-surface {
+            background: rgba(19, 19, 20, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .transition-cubic {
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6">
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 bg-black/60 backdrop-blur-md z-0"></div>
+<!-- Main Modal Container -->
+<main class="relative z-10 w-full max-w-[720px] glass-surface rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-300">
+<!-- Header -->
+<header class="flex justify-between items-start p-xl border-b border-white/5">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Share "Backend Architecture"</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Invite people and manage access to this document</p>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface p-1 transition-cubic rounded-lg hover:bg-white/5">
+<span class="material-symbols-outlined">close</span>
+</button>
+</header>
+<div class="p-xl space-y-lg custom-scrollbar max-h-[716px] overflow-y-auto">
+<!-- Invite Section -->
+<section class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Invite people</label>
+<div class="flex items-center gap-md p-sm bg-surface-container-low border border-white/10 rounded-lg focus-within:border-primary-container/50 focus-within:ring-2 focus-within:ring-primary-container/10 transition-cubic">
+<div class="flex flex-wrap gap-xs flex-1">
+<!-- Chips -->
+<div class="flex items-center gap-1.5 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+<span class="font-body-sm text-body-sm text-primary">marcus@syncdocs.io</span>
+<button class="text-primary/70 hover:text-primary leading-none">
+<span class="material-symbols-outlined !text-[16px]">close</span>
+</button>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+<span class="font-body-sm text-body-sm text-primary">dev-team</span>
+<button class="text-primary/70 hover:text-primary leading-none">
+<span class="material-symbols-outlined !text-[16px]">close</span>
+</button>
+</div>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface font-body-sm placeholder:text-on-surface-variant/50 flex-1 min-w-[150px]" placeholder="Enter name or email..." type="text"/>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary font-body-sm font-semibold px-6 py-2 rounded-lg transition-cubic active:scale-95 shadow-lg shadow-primary/20">
+                        Invite
+                    </button>
+</div>
+</section>
+<!-- Link Sharing Card -->
+<section class="bg-surface-container-highest/30 border border-white/5 rounded-xl p-md flex items-center justify-between group">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-on-surface-variant/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">public</span>
+</div>
+<div>
+<h3 class="font-body-md text-body-md text-on-surface font-medium">General access</h3>
+<div class="flex items-center gap-xs cursor-pointer group/dropdown">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Anyone with the link</span>
+<span class="material-symbols-outlined !text-[18px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-cubic">
+<span class="material-symbols-outlined !text-[18px]">link</span>
+<span class="font-body-sm text-body-sm">Copy Link</span>
+</button>
+<button class="p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-cubic" title="Generate New Link">
+<span class="material-symbols-outlined !text-[20px]">refresh</span>
+</button>
+</div>
+</section>
+<!-- Collaborators List -->
+<section class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Collaborators</label>
+<div class="space-y-1">
+<!-- Row 1: Alex Johnson -->
+<div class="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-cubic group">
+<div class="flex items-center gap-md">
+<img class="w-10 h-10 rounded-full border border-white/10 bg-surface-container-high object-cover" data-alt="Professional headshot of a software engineer named Alex Johnson, medium close-up, studio lighting, soft bokeh background, dark professional attire, cinematic tone, high fidelity photography for a tech startup profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3HHXXJHDEvayGCdgYkQ4WhTLrWbWLn4eCtfUCED8UvGVJRw8ePlaKQbuSyWJB0ssTs6xWo-V2ja6yJRxMaSSWXpcPJXe9Zkt2__6-qCD_XfEzTqG8pSlkdkWeztd-VsIvw7O3oJyaNRTDp6250jwenW7TPYILPo9-6_hz-fylbNtVupF8N91v2Z6ooPFiO5Y8rthohEPRotb2khoqQHbI1JSFnEzw6HxcRTNWD8oH78ys2b9338X_"/>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Alex Johnson <span class="ml-2 font-mono-sm text-[11px] uppercase tracking-widest text-primary/60 border border-primary/30 px-1.5 py-0.5 rounded">Owner</span></p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">alex@syncdocs.io</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="px-3 py-1.5 font-body-sm text-body-sm text-on-surface-variant bg-white/5 rounded-lg border border-white/5">
+                                Full Access
+                            </div>
+</div>
+</div>
+<!-- Row 2: Sarah Chen -->
+<div class="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-cubic group">
+<div class="flex items-center gap-md">
+<img class="w-10 h-10 rounded-full border border-white/10 bg-surface-container-high object-cover" data-alt="Portrait of Sarah Chen, a tech product manager, elegant professional lighting, minimalistic tech-focused background, looking directly at the camera with a confident expression, soft shadows, sharp focus on eyes, ultra-realistic digital photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpNhNn28zjqSiFU5V_zJyEkoiKhy1FwZWX2zRis5FkCDdE1VwsVMrnOaDwhC87aB13OEgYu0LZTqsbek3AB2Yr2x-b94l6Fkj9uVhIXFFptHpCrvbusJD8rEHERGc365xTO4KxetbPr9LJMkFYG2lmLBU1nJgDtX0T2plYVUwTKrqw-Bf54ImNsnWUj40ArAPwNO-vOdMPjPLFki14sK_eh_XB0rKyTRDGS46FpUQQdALKD0a2xwOu"/>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Sarah Chen</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">sarah@syncdocs.io</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-2 px-3 py-1.5 font-body-sm text-body-sm text-on-surface cursor-pointer hover:bg-white/10 rounded-lg transition-cubic">
+<span>Editor</span>
+<span class="material-symbols-outlined !text-[18px] text-on-surface-variant">expand_more</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-1.5 text-error/60 hover:text-error hover:bg-error/10 rounded-lg transition-cubic">
+<span class="material-symbols-outlined !text-[20px]">person_remove</span>
+</button>
+</div>
+</div>
+<!-- Row 3: Rahul Mehta -->
+<div class="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-cubic group">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center border border-secondary/20 font-bold text-secondary">RM</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Rahul Mehta</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">rahul@syncdocs.io</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-2 px-3 py-1.5 font-body-sm text-body-sm text-on-surface cursor-pointer hover:bg-white/10 rounded-lg transition-cubic">
+<span>Commenter</span>
+<span class="material-symbols-outlined !text-[18px] text-on-surface-variant">expand_more</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-1.5 text-error/60 hover:text-error hover:bg-error/10 rounded-lg transition-cubic">
+<span class="material-symbols-outlined !text-[20px]">person_remove</span>
+</button>
+</div>
+</div>
+<!-- Row 4: Emily Davis -->
+<div class="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-cubic group">
+<div class="flex items-center gap-md">
+<img class="w-10 h-10 rounded-full border border-white/10 bg-surface-container-high object-cover" data-alt="Professional studio portrait of Emily Davis, high-end commercial photography style, clean white background with soft grey gradients, sharp focus, vibrant natural skin tones, wearing modern business casual, digital nomad aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9WE6G4wDX0XgKiixtolSH6P57629tTa0wtKLpAkteRVQEkNpuV9Q6S1XHDmCnIBnv60bUnbelHTODqGvxdJ-NYrIk05UwE7PFCzBKFhOASBSRXHc-s7udZrfm918qcinLvUmd_UuzkiDRlOXS2a-EAl2qpYDzkrNejrvJEIxDN4qiUvMxLMeMZooJCkVeykWBxLCBBdzakw5x9i-zQBm9feNuskmszP-mr_VZqftBoY8leSVreF-M"/>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Emily Davis</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">emily@syncdocs.io</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-2 px-3 py-1.5 font-body-sm text-body-sm text-on-surface cursor-pointer hover:bg-white/10 rounded-lg transition-cubic">
+<span>Viewer</span>
+<span class="material-symbols-outlined !text-[18px] text-on-surface-variant">expand_more</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-1.5 text-error/60 hover:text-error hover:bg-error/10 rounded-lg transition-cubic">
+<span class="material-symbols-outlined !text-[20px]">person_remove</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Security Info Bar -->
+<div class="px-xl py-3 bg-white/[0.02] flex items-center justify-between border-y border-white/5">
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
+<span class="material-symbols-outlined !text-[16px]">lock</span>
+<span>End-to-end encrypted</span>
+</div>
+<div class="h-1 w-1 rounded-full bg-white/20"></div>
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
+<span class="material-symbols-outlined !text-[16px]">event_repeat</span>
+<span>Link expires: Never</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
+<span class="material-symbols-outlined !text-[16px]">download_done</span>
+<span>Download: Allowed</span>
+</div>
+</div>
+<!-- Footer Actions -->
+<footer class="p-xl flex justify-end items-center gap-md">
+<button class="px-6 py-2.5 font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-lg transition-cubic">
+                Cancel
+            </button>
+<button class="px-8 py-2.5 font-body-md text-body-md font-semibold bg-primary hover:bg-primary-container text-on-primary rounded-lg transition-cubic active:scale-95 shadow-xl shadow-primary/10">
+                Save Changes
+            </button>
+</footer>
+</main>
+<!-- Animated Subtle Atmosphere -->
+<div class="fixed inset-0 -z-10 pointer-events-none opacity-40">
+<div class="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-primary/5 blur-[120px] rounded-full animate-pulse"></div>
+<div class="absolute bottom-[-10%] right-[-5%] w-[30vw] h-[30vw] bg-secondary/5 blur-[100px] rounded-full" style="animation-delay: 2s;"></div>
+</div>
+<script>
+        // Simple Interaction: Close button / Cancel button
+        const closeBtn = document.querySelector('header button');
+        const cancelBtn = document.querySelector('footer button:first-child');
+        const modal = document.querySelector('main');
+
+        [closeBtn, cancelBtn].forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.classList.add('scale-95', 'opacity-0');
+                modal.classList.remove('scale-100', 'opacity-100');
+                setTimeout(() => {
+                    alert('Modal interaction would close this in a live app.');
+                    modal.classList.remove('scale-95', 'opacity-0');
+                    modal.classList.add('scale-100', 'opacity-100');
+                }, 300);
+            });
+        });
+
+        // Simple Hover logic for Rows (Remove Icon)
+        const rows = document.querySelectorAll('.Collaborators-list-row'); // Adding this manually in head for select-ability if needed
+        // The tailwind 'group' classes already handle this.
+    </script>
+</body></html>
