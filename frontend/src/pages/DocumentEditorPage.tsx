@@ -468,9 +468,9 @@ export const DocumentEditorPage: React.FC = () => {
         </div>
 
         <div className="editor-bar-actions">
-          {/* History Toggle */}
-          <button onClick={handleToggleHistoryDrawer} className="back-btn">
-            📜 Audit History
+          {/* History Page Route Navigation */}
+          <button onClick={() => navigate(`/documents/${id}/history`)} className="back-btn">
+            📜 Version Control
           </button>
 
           {/* Share Modal Toggle */}

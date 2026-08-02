@@ -10,6 +10,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import DocumentsPage from './pages/DocumentsPage';
 import DocumentEditorPage from './pages/DocumentEditorPage';
+import VersionHistoryPage from './pages/VersionHistoryPage';
 import './App.css';
 
 const HomeRedirect: React.FC = () => {
@@ -36,6 +37,7 @@ export const App: React.FC = () => {
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/documents" element={<DocumentsPage />} />
                   <Route path="/documents/:id" element={<DocumentEditorPage />} />
+                  <Route path="/documents/:id/history" element={<VersionHistoryPage />} />
                 </Route>
               </Routes>
             </main>
@@ -47,3 +49,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+
