@@ -12,6 +12,7 @@ import DocumentsPage from './pages/DocumentsPage';
 import DocumentEditorPage from './pages/DocumentEditorPage';
 import VersionHistoryPage from './pages/VersionHistoryPage';
 import WorkspaceSettingsPage from './pages/WorkspaceSettingsPage';
+import UserProfilePage from './pages/UserProfilePage';
 import './App.css';
 
 const HomeRedirect: React.FC = () => {
@@ -40,6 +41,7 @@ export const App: React.FC = () => {
                   <Route path="/documents/:id" element={<DocumentEditorPage />} />
                   <Route path="/documents/:id/history" element={<VersionHistoryPage />} />
                   <Route path="/settings" element={<WorkspaceSettingsPage />} />
+                  <Route path="/profile" element={<UserProfilePage />} />
                 </Route>
               </Routes>
             </main>
