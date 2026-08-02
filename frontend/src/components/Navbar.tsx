@@ -22,6 +22,9 @@ export const Navbar: React.FC = () => {
             <span className="navbar-user">Hello, {user.name}</span>
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/documents">Documents</Link>
+            <Link to="/notifications">Notifications</Link>
+            <Link to="/settings">Settings</Link>
+            <Link to="/profile">Profile</Link>
             <button onClick={handleLogout} className="btn-logout">
               Logout
             </button>
