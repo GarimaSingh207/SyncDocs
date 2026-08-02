@@ -6,6 +6,7 @@ import sharingService from '../services/sharing';
 import historyService from '../services/history';
 import useSocket from '../hooks/useSocket';
 import axios from 'axios';
+import './DocumentEditorPage.css';
 
 interface RoomUser {
   userId: string;
@@ -433,17 +434,17 @@ export const DocumentEditorPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="page-container" style={{ textAlign: 'center', padding: '3rem' }}>
-        <p>Loading document editor...</p>
+      <div className="editor-page-wrapper" style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <p style={{ color: '#9ca3af' }}>Loading collaborative editor workspace...</p>
       </div>
     );
   }
 
   if (error && !document) {
     return (
-      <div className="page-container">
+      <div className="editor-page-wrapper" style={{ padding: '2rem' }}>
         <div className="alert alert-error">{error}</div>
-        <button onClick={() => navigate('/documents')} className="btn btn-secondary">
+        <button onClick={() => navigate('/documents')} className="back-btn" style={{ width: 'fit-content', marginTop: '1rem' }}>
           ← Back to Documents
         </button>
       </div>
@@ -453,37 +454,39 @@ export const DocumentEditorPage: React.FC = () => {
   const isReadOnly = userRole === 'VIEWER';
 
   return (
-    <div className="page-container editor-container">
-      <div className="editor-header">
-        <button onClick={() => navigate('/documents')} className="btn btn-secondary">
-          ← Back to Documents
-        </button>
-        <div className="editor-actions">
-          {/* Socket Connection Badge */}
-          <span className="socket-status-badge">
-            {connected ? '● Live' : connecting ? '🟡 Connecting...' : '🔴 Disconnected'}
+    <div className="editor-page-wrapper">
+      {/* Top Navigation & Status Bar */}
+      <div className="editor-top-bar">
+        <div className="editor-bar-left">
+          <button onClick={() => navigate('/documents')} className="back-btn">
+            ← Back
+          </button>
+          <span className={`status-badge status-${connected ? 'live' : connecting ? 'connecting' : 'disconnected'}`}>
+            {connected ? '● Live Socket' : connecting ? '🟡 Connecting' : '🔴 Disconnected'}
           </span>
-
           <span className={`role-badge role-${userRole.toLowerCase()}`}>{userRole}</span>
+        </div>
 
-          {/* History Drawer Toggle */}
-          <button onClick={handleToggleHistoryDrawer} className="btn btn-secondary">
-            📜 History
+        <div className="editor-bar-actions">
+          {/* History Toggle */}
+          <button onClick={handleToggleHistoryDrawer} className="back-btn">
+            📜 Audit History
           </button>
 
+          {/* Share Modal Toggle */}
           {userRole === 'OWNER' && (
-            <button onClick={handleOpenShareModal} className="btn btn-secondary">
-              👥 Share
+            <button onClick={handleOpenShareModal} className="back-btn" style={{ background: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 0.4)', color: '#ffffff' }}>
+              👥 Manage Sharing
             </button>
           )}
 
-          {/* Auto-Save Status Indicator */}
+          {/* Auto-Save Status */}
           {!isReadOnly && (
             <span className={`save-status save-${saveStatus}`}>
               {saveStatus === 'saving' && '● Saving...'}
               {saveStatus === 'saved' && '✓ Saved'}
               {saveStatus === 'unsaved' && '● Unsaved'}
-              {saveStatus === 'error' && '⚠ Save failed'}
+              {saveStatus === 'error' && '⚠ Save error'}
             </span>
           )}
         </div>
@@ -491,36 +494,41 @@ export const DocumentEditorPage: React.FC = () => {
 
       {error && <div className="alert alert-error">{error}</div>}
 
-      {/* Remote Edit Toast Banner */}
+      {/* Remote Edit Toast */}
       {remoteNotice && (
-        <div
-          className="alert"
-          style={{
-            backgroundColor: 'rgba(16, 185, 129, 0.15)',
-            border: '1px solid #10b981',
-            color: '#6ee7b7',
-            transition: 'all 0.3s ease',
-          }}
-        >
+        <div className="alert" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7', marginBottom: '1rem' }}>
           ⚡ {remoteNotice}
         </div>
       )}
 
-      {/* History Drawer Panel */}
+      {/* Active Presence Strip */}
+      <div className="presence-strip">
+        <span className="presence-label">Collaborators viewing room:</span>
+        <div className="presence-list">
+          {activeRoomUsers.length === 0 ? (
+            <span style={{ color: '#6b7280', fontStyle: 'italic' }}>Only you</span>
+          ) : (
+            activeRoomUsers.map((u) => (
+              <span key={u.userId} className={`presence-pill presence-${u.role.toLowerCase()}`}>
+                {u.name} ({u.role})
+              </span>
+            ))
+          )}
+        </div>
+      </div>
+
+      {isReadOnly && (
+        <div className="alert" style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', border: '1px solid #3b82f6', color: '#93c5fd', marginBottom: '1rem' }}>
+          ℹ Read-only viewer access. Edits are disabled for your account role.
+        </div>
+      )}
+
+      {/* History Drawer Overlay */}
       {showHistoryDrawer && (
-        <div
-          className="history-panel"
-          style={{
-            backgroundColor: '#111827',
-            padding: '1.5rem',
-            borderRadius: '8px',
-            border: '1px solid #374151',
-            marginBottom: '1.5rem',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, color: '#f3f4f6' }}>📜 Edit History & Audit Logs</h3>
-            <button onClick={handleToggleHistoryDrawer} className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.85rem' }}>
+        <div className="drawer-overlay">
+          <div className="drawer-header">
+            <h3 className="drawer-title">📜 Document History & Audit Logs</h3>
+            <button onClick={handleToggleHistoryDrawer} className="back-btn" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>
               Close ✕
             </button>
           </div>
@@ -528,42 +536,26 @@ export const DocumentEditorPage: React.FC = () => {
           {historyError && <div className="alert alert-error">{historyError}</div>}
 
           {historyLoading && historyEvents.length === 0 ? (
-            <p style={{ color: '#9ca3af', textAlign: 'center', padding: '1rem 0' }}>Loading edit history...</p>
+            <p style={{ color: '#9ca3af', textAlign: 'center' }}>Loading edit audit logs...</p>
           ) : historyEvents.length === 0 ? (
-            <p style={{ color: '#9ca3af', textAlign: 'center', padding: '1rem 0' }}>No edit history logged yet. Edits will appear here after auto-saving!</p>
+            <p style={{ color: '#9ca3af', textAlign: 'center' }}>No edit history logged yet.</p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            <div>
               {historyEvents.map((evt) => (
-                <div
-                  key={evt.id}
-                  style={{
-                    backgroundColor: '#1f2937',
-                    padding: '1rem',
-                    borderRadius: '6px',
-                    border: '1px solid #374151',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                    <strong style={{ color: '#60a5fa' }}>{evt.userName}</strong>
-                    <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>{formatTimeAgo(evt.createdAt)}</span>
+                <div key={evt.id} className="history-item-card">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                    <strong style={{ color: '#818cf8' }}>{evt.userName}</strong>
+                    <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{formatTimeAgo(evt.createdAt)}</span>
                   </div>
-                  <div style={{ fontSize: '0.85rem', color: '#d1d5db', marginBottom: '0.4rem' }}>
+                  <div style={{ fontSize: '0.85rem', color: '#d1d5db' }}>
                     <strong>Title:</strong> {evt.title}
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: '#9ca3af', backgroundColor: '#111827', padding: '0.5rem', borderRadius: '4px', fontStyle: 'italic' }}>
-                    "{evt.content ? (evt.content.length > 150 ? `${evt.content.substring(0, 150)}...` : evt.content) : 'Empty content'}"
                   </div>
                 </div>
               ))}
 
               {hasMoreHistory && (
-                <button
-                  onClick={handleLoadMoreHistory}
-                  className="btn btn-secondary"
-                  style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
-                  disabled={historyLoading}
-                >
-                  {historyLoading ? 'Loading...' : 'Load More History'}
+                <button onClick={handleLoadMoreHistory} className="back-btn" style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }} disabled={historyLoading}>
+                  {historyLoading ? 'Loading...' : 'Load More'}
                 </button>
               )}
             </div>
@@ -571,184 +563,83 @@ export const DocumentEditorPage: React.FC = () => {
         </div>
       )}
 
-      {/* Realtime Active Presence Section */}
-      <div
-        className="presence-bar"
-        style={{
-          backgroundColor: '#111827',
-          padding: '0.6rem 1rem',
-          borderRadius: '6px',
-          border: '1px solid #374151',
-          marginBottom: '1.25rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem',
-        }}
-      >
-        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#9ca3af' }}>Currently viewing:</span>
-        {activeRoomUsers.length === 0 ? (
-          <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>Only you</span>
-        ) : (
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            {activeRoomUsers.map((u) => (
-              <span key={u.userId} className={`presence-pill presence-${u.role.toLowerCase()}`}>
-                {u.name} ({u.role})
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {isReadOnly && (
-        <div
-          className="alert"
-          style={{
-            backgroundColor: 'rgba(59, 130, 246, 0.15)',
-            border: '1px solid #3b82f6',
-            color: '#93c5fd',
-          }}
-        >
-          ℹ You have read-only (Viewer) access to this document.
-        </div>
-      )}
-
-      {/* Share / Collaborators Panel */}
+      {/* Share / Access Modal Overlay */}
       {showShareModal && userRole === 'OWNER' && (
-        <div
-          className="share-panel"
-          style={{
-            backgroundColor: '#111827',
-            padding: '1.5rem',
-            borderRadius: '8px',
-            border: '1px solid #374151',
-            marginBottom: '1.5rem',
-          }}
-        >
-          <h3 style={{ marginTop: 0, color: '#f3f4f6' }}>Manage Collaborators</h3>
+        <div className="drawer-overlay">
+          <div className="drawer-header">
+            <h3 className="drawer-title">👥 Document Collaborators</h3>
+            <button onClick={handleOpenShareModal} className="back-btn" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>
+              Close ✕
+            </button>
+          </div>
 
           {shareError && <div className="alert alert-error">{shareError}</div>}
-          {shareSuccess && (
-            <div
-              className="alert"
-              style={{
-                backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                border: '1px solid #10b981',
-                color: '#6ee7b7',
-              }}
-            >
-              {shareSuccess}
-            </div>
-          )}
+          {shareSuccess && <div className="alert" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7' }}>{shareSuccess}</div>}
 
-          <form onSubmit={handleShareUser} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
+          <form onSubmit={handleShareUser} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.25rem' }}>
             <input
               type="email"
-              placeholder="User email address..."
+              placeholder="Collaborator user email..."
               value={shareEmail}
               onChange={(e) => setShareEmail(e.target.value)}
               required
-              style={{
-                flex: 1,
-                padding: '0.6rem 0.8rem',
-                backgroundColor: '#1f2937',
-                border: '1px solid #374151',
-                borderRadius: '6px',
-                color: '#fff',
-              }}
+              style={{ flex: 1, padding: '0.5rem', background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#fff' }}
               disabled={shareLoading}
             />
             <select
               value={shareRole}
               onChange={(e) => setShareRole(e.target.value as Role)}
-              style={{
-                padding: '0.6rem 0.8rem',
-                backgroundColor: '#1f2937',
-                border: '1px solid #374151',
-                borderRadius: '6px',
-                color: '#fff',
-              }}
+              style={{ padding: '0.5rem', background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#fff' }}
               disabled={shareLoading}
             >
               <option value="VIEWER">Viewer</option>
               <option value="EDITOR">Editor</option>
             </select>
-            <button type="submit" className="btn btn-primary" disabled={shareLoading || !shareEmail.trim()}>
+            <button type="submit" className="create-doc-btn" disabled={shareLoading || !shareEmail.trim()}>
               {shareLoading ? 'Sharing...' : 'Invite'}
             </button>
           </form>
 
-          <h4 style={{ color: '#d1d5db', marginBottom: '0.75rem' }}>Current Collaborators</h4>
-          {collaborators.length === 0 ? (
-            <p style={{ color: '#9ca3af', fontSize: '0.9rem' }}>No collaborators invited yet.</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {collaborators.map((c) => (
-                <div
-                  key={c.accessId}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    backgroundColor: '#1f2937',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '6px',
-                    border: '1px solid #374151',
-                  }}
-                >
-                  <div>
-                    <strong style={{ color: '#f9fafb' }}>{c.name}</strong>{' '}
-                    <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>({c.email})</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <select
-                      value={c.role}
-                      onChange={(e) => handleUpdateRole(c.accessId, e.target.value as Role)}
-                      style={{
-                        padding: '0.4rem 0.6rem',
-                        backgroundColor: '#111827',
-                        border: '1px solid #374151',
-                        borderRadius: '4px',
-                        color: '#fff',
-                        fontSize: '0.85rem',
-                      }}
-                    >
-                      <option value="VIEWER">Viewer</option>
-                      <option value="EDITOR">Editor</option>
-                    </select>
-                    <button
-                      onClick={() => handleRemoveAccess(c.accessId, c.email)}
-                      className="btn btn-danger"
-                      style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}
-                    >
-                      Remove
-                    </button>
-                  </div>
+          <div>
+            {collaborators.map((c) => (
+              <div key={c.accessId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(31, 41, 55, 0.4)', padding: '0.65rem', borderRadius: '6px', marginBottom: '0.5rem' }}>
+                <div>
+                  <strong style={{ color: '#f3f4f6' }}>{c.name}</strong> <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>({c.email})</span>
                 </div>
-              ))}
-            </div>
-          )}
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <select
+                    value={c.role}
+                    onChange={(e) => handleUpdateRole(c.accessId, e.target.value as Role)}
+                    style={{ padding: '0.3rem', background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', color: '#fff', fontSize: '0.8rem' }}
+                  >
+                    <option value="VIEWER">Viewer</option>
+                    <option value="EDITOR">Editor</option>
+                  </select>
+                  <button onClick={() => handleRemoveAccess(c.accessId, c.email)} className="action-btn-danger">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      <div className="editor-title-group">
+      {/* Editor Main Canvas */}
+      <div className="editor-canvas-container">
         <input
           type="text"
-          className="editor-title-input"
+          className="modern-title-input"
           value={title}
           onChange={handleTitleChange}
           placeholder="Document Title"
           disabled={isReadOnly}
         />
-      </div>
-
-      <div className="editor-body">
         <textarea
-          className="editor-textarea"
+          className="modern-editor-textarea"
           value={content}
           onChange={handleContentChange}
-          placeholder={
-            isReadOnly ? 'Read-only document content.' : 'Start typing your document content here...'
-          }
+          placeholder={isReadOnly ? 'Read-only document content.' : 'Start typing your document content here...'}
           disabled={isReadOnly}
         />
       </div>
