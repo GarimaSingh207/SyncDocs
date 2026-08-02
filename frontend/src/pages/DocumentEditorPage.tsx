@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { Document, Role, Collaborator, EditEventItem } from '../types';
+import type { Document, Role, EditEventItem } from '../types';
 import documentService from '../services/documents';
-import sharingService from '../services/sharing';
 import historyService from '../services/history';
 import useSocket from '../hooks/useSocket';
 import axios from 'axios';
 import './DocumentEditorPage.css';
+
+import ShareModal from '../components/ShareModal';
 
 interface RoomUser {
   userId: string;
@@ -76,12 +77,10 @@ export const DocumentEditorPage: React.FC = () => {
 
   // Sharing State
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
-  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
-  const [shareEmail, setShareEmail] = useState('');
-  const [shareRole, setShareRole] = useState<Role>('VIEWER');
-  const [shareLoading, setShareLoading] = useState(false);
-  const [shareError, setShareError] = useState<string | null>(null);
-  const [shareSuccess, setShareSuccess] = useState<string | null>(null);
+
+  const handleOpenShareModal = () => {
+    setShowShareModal(!showShareModal);
+  };
 
   // History Drawer State (Lazy Loaded)
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
@@ -357,80 +356,7 @@ export const DocumentEditorPage: React.FC = () => {
     isRemoteEditRef.current = false;
   };
 
-  const loadCollaborators = async () => {
-    if (!id || userRole !== 'OWNER') return;
-    try {
-      const accessList = await sharingService.getDocumentAccess(id);
-      setCollaborators(accessList);
-    } catch (err) {
-      console.error('Failed to load collaborators:', err);
-    }
-  };
 
-  const handleOpenShareModal = () => {
-    setShowShareModal(!showShareModal);
-    if (!showShareModal) {
-      loadCollaborators();
-    }
-  };
-
-  const handleShareUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!id || !shareEmail.trim()) return;
-
-    setShareLoading(true);
-    setShareError(null);
-    setShareSuccess(null);
-
-    try {
-      const updatedList = await sharingService.shareDocument(id, {
-        email: shareEmail.trim(),
-        role: shareRole,
-      });
-      setCollaborators(updatedList);
-      setShareEmail('');
-      setShareSuccess('Document shared successfully!');
-      setTimeout(() => setShareSuccess(null), 3000);
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data?.message) {
-        setShareError(err.response.data.message);
-      } else {
-        setShareError('Failed to share document.');
-      }
-    } finally {
-      setShareLoading(false);
-    }
-  };
-
-  const handleUpdateRole = async (accessId: string, newRole: Role) => {
-    if (!id) return;
-    setShareError(null);
-    try {
-      const updatedList = await sharingService.updateAccessRole(id, accessId, { role: newRole });
-      setCollaborators(updatedList);
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data?.message) {
-        setShareError(err.response.data.message);
-      } else {
-        setShareError('Failed to update collaborator role.');
-      }
-    }
-  };
-
-  const handleRemoveAccess = async (accessId: string, email: string) => {
-    if (!id || !window.confirm(`Remove access for ${email}?`)) return;
-    setShareError(null);
-    try {
-      await sharingService.removeAccess(id, accessId);
-      setCollaborators((prev) => prev.filter((c) => c.accessId !== accessId));
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data?.message) {
-        setShareError(err.response.data.message);
-      } else {
-        setShareError('Failed to remove collaborator access.');
-      }
-    }
-  };
 
   if (loading) {
     return (
@@ -563,66 +489,13 @@ export const DocumentEditorPage: React.FC = () => {
         </div>
       )}
 
-      {/* Share / Access Modal Overlay */}
+      {/* Share / Access Modal Component */}
       {showShareModal && userRole === 'OWNER' && (
-        <div className="drawer-overlay">
-          <div className="drawer-header">
-            <h3 className="drawer-title">👥 Document Collaborators</h3>
-            <button onClick={handleOpenShareModal} className="back-btn" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>
-              Close ✕
-            </button>
-          </div>
-
-          {shareError && <div className="alert alert-error">{shareError}</div>}
-          {shareSuccess && <div className="alert" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7' }}>{shareSuccess}</div>}
-
-          <form onSubmit={handleShareUser} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.25rem' }}>
-            <input
-              type="email"
-              placeholder="Collaborator user email..."
-              value={shareEmail}
-              onChange={(e) => setShareEmail(e.target.value)}
-              required
-              style={{ flex: 1, padding: '0.5rem', background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#fff' }}
-              disabled={shareLoading}
-            />
-            <select
-              value={shareRole}
-              onChange={(e) => setShareRole(e.target.value as Role)}
-              style={{ padding: '0.5rem', background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#fff' }}
-              disabled={shareLoading}
-            >
-              <option value="VIEWER">Viewer</option>
-              <option value="EDITOR">Editor</option>
-            </select>
-            <button type="submit" className="create-doc-btn" disabled={shareLoading || !shareEmail.trim()}>
-              {shareLoading ? 'Sharing...' : 'Invite'}
-            </button>
-          </form>
-
-          <div>
-            {collaborators.map((c) => (
-              <div key={c.accessId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(31, 41, 55, 0.4)', padding: '0.65rem', borderRadius: '6px', marginBottom: '0.5rem' }}>
-                <div>
-                  <strong style={{ color: '#f3f4f6' }}>{c.name}</strong> <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>({c.email})</span>
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                  <select
-                    value={c.role}
-                    onChange={(e) => handleUpdateRole(c.accessId, e.target.value as Role)}
-                    style={{ padding: '0.3rem', background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', color: '#fff', fontSize: '0.8rem' }}
-                  >
-                    <option value="VIEWER">Viewer</option>
-                    <option value="EDITOR">Editor</option>
-                  </select>
-                  <button onClick={() => handleRemoveAccess(c.accessId, c.email)} className="action-btn-danger">
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ShareModal
+          documentId={id!}
+          documentTitle={title}
+          onClose={handleOpenShareModal}
+        />
       )}
 
       {/* Editor Main Canvas */}

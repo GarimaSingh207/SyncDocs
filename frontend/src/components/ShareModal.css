@@ -1,0 +1,207 @@
+/* ShareModal.css - Isolated styling for the ShareModal component */
+
+.share-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+}
+
+.share-modal-container {
+  width: 100%;
+  max-width: 640px;
+  background: rgba(19, 20, 23, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #e5e2e3;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  animation: modalFadeIn 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.share-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.share-modal-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #f3f4f6;
+  margin: 0 0 0.25rem 0;
+}
+
+.share-modal-subtitle {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.share-modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+/* Invite Form */
+.invite-form-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.invite-input {
+  flex: 1;
+  min-width: 220px;
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  color: #f3f4f6;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+.invite-input:focus {
+  outline: none;
+  border-color: #818cf8;
+}
+
+.role-select {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  color: #f3f4f6;
+  font-size: 0.9rem;
+}
+
+.invite-btn {
+  background: #818cf8;
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.invite-btn:hover:not(:disabled) {
+  background: #a5b4fc;
+}
+
+.invite-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Copy Link Section */
+.copy-link-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(31, 41, 55, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 0.85rem 1.25rem;
+}
+
+.copy-link-text {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.copy-link-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #818cf8;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-link-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+  color: #ffffff;
+}
+
+/* Collaborator List */
+.collaborator-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.collaborator-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(31, 41, 55, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.collaborator-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.collaborator-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f9fafb;
+}
+
+.collaborator-email {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.collaborator-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
