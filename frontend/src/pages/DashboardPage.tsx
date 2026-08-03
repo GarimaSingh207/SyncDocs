@@ -189,42 +189,46 @@ export const DashboardPage: React.FC = () => {
         </section>
       </main>
 
-      {/* Right Sidebar Activity Feed */}
+      {/* Right Sidebar Workspace Summary */}
       <aside className="dash-sidebar-right">
-        <div className="dash-right-title">Live Activity</div>
+        <div className="dash-right-title">Workspace Summary</div>
 
-        <div className="dash-activity-item">
-          <div className="dash-activity-avatar">S</div>
-          <div>
-            <div className="dash-activity-text">
-              <strong style={{ color: '#e5e2e3' }}>Sarah</strong> updated workspace specs
+        <div className="dash-activity-item" style={{ flexDirection: 'column', gap: '16px' }}>
+          <div className="dash-glass-card" style={{ padding: '16px', borderRadius: '12px', width: '100%' }}>
+            <div style={{ fontSize: '11px', color: 'rgba(199, 196, 215, 0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '700', marginBottom: '6px' }}>
+              Workspace Owner
             </div>
-            <div className="dash-activity-time">12 mins ago</div>
+            <div style={{ fontSize: '15px', fontWeight: '700', color: '#e5e2e3' }}>
+              {user.name}
+            </div>
+            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>
+              {user.email}
+            </div>
           </div>
-        </div>
 
-        <div className="dash-activity-item">
-          <div className="dash-activity-avatar" style={{ background: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa' }}>A</div>
-          <div>
-            <div className="dash-activity-text">
-              <strong style={{ color: '#e5e2e3' }}>Alex</strong> edited Product Roadmap
+          <div className="dash-glass-card" style={{ padding: '16px', borderRadius: '12px', width: '100%' }}>
+            <div style={{ fontSize: '11px', color: 'rgba(199, 196, 215, 0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '700', marginBottom: '6px' }}>
+              Total Documents
             </div>
-            <div className="dash-activity-time">1 hour ago</div>
+            <div style={{ fontSize: '24px', fontWeight: '800', color: '#c0c1ff' }}>
+              {totalCount}
+            </div>
           </div>
-        </div>
 
-        <div className="dash-activity-item">
-          <div className="dash-activity-avatar" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399' }}>E</div>
-          <div>
-            <div className="dash-activity-text">
-              <strong style={{ color: '#e5e2e3' }}>Emma</strong> joined workspace
+          <div className="dash-glass-card" style={{ padding: '16px', borderRadius: '12px', width: '100%' }}>
+            <div style={{ fontSize: '11px', color: 'rgba(199, 196, 215, 0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '700', marginBottom: '6px' }}>
+              Sync Engine Status
             </div>
-            <div className="dash-activity-time">2 hours ago</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#34d399', fontWeight: '600', marginTop: '4px' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#34d399', display: 'inline-block' }}></span>
+              Operational (WebSocket)
+            </div>
           </div>
         </div>
       </aside>
     </div>
   );
 };
+
 
 export default DashboardPage;
