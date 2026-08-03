@@ -1,82 +1,65 @@
-/* LandingPage.css - Scoped styling for modernized Landing Page matching ui/landingPage Stitch export */
+/* LandingPage.css - Exact styling for Stitch Landing Page export (ui/landingPage) */
+
+:root {
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(19, 20, 23, 0.7);
+}
 
 .landing-page-container {
-  background-color: #0a0a0b;
+  background-color: #0A0A0B;
   color: #e5e2e3;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
 }
 
-/* Glassmorphism Cards */
-.landing-glass-card {
-  background: rgba(19, 20, 23, 0.7);
+/* Glassmorphic Cards */
+.glass-card {
+  background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
   box-shadow: 0 40px 64px -12px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
 }
 
-.landing-glass-card:hover {
+.glass-card:hover {
   border-color: rgba(99, 102, 241, 0.2);
   background: rgba(26, 28, 32, 0.8);
 }
 
-/* Atmospheric Hero Glow */
-.landing-hero-glow {
+/* Hero Glow */
+.hero-glow {
   position: absolute;
-  width: 900px;
-  height: 900px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 70%);
+  width: 1000px;
+  height: 1000px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0) 70%);
   z-index: 0;
   filter: blur(100px);
   pointer-events: none;
-  animation: landing-pulse-glow 10s ease-in-out infinite alternate;
+  animation: pulse-glow 10s ease-in-out infinite alternate;
 }
 
-@keyframes landing-pulse-glow {
+@keyframes pulse-glow {
   0% { transform: scale(1); opacity: 0.5; }
   100% { transform: scale(1.1); opacity: 0.8; }
 }
 
-/* Animated Cursor Movements */
-.landing-cursor-blink {
+/* Typing Simulator */
+.cursor-blink {
   display: inline-block;
   width: 2px;
   height: 1.2em;
   background-color: #c0c1ff;
   vertical-align: middle;
   margin-left: 2px;
-  animation: landing-blink 1s step-end infinite;
+  animation: blink 1s step-end infinite;
 }
 
-@keyframes landing-blink {
+@keyframes blink {
   from, to { opacity: 0; }
   50% { opacity: 1; }
-}
-
-.landing-cursor-sarah {
-  position: absolute;
-  top: 128px;
-  left: 50%;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  animation: cursorMoveSarah 12s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.landing-cursor-alex {
-  position: absolute;
-  bottom: 96px;
-  left: 25%;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  animation: cursorMoveAlex 15s ease-in-out infinite;
-  pointer-events: none;
 }
 
 @keyframes cursorMoveSarah {
@@ -93,122 +76,30 @@
   80% { transform: translate(-70px, 30px); }
 }
 
-/* Navigation Bar */
-.landing-navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 50;
-  background: rgba(19, 20, 23, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
 }
 
-.landing-nav-inner {
-  max-width: 1440px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 80px;
-  padding: 0 24px;
+.animate-sarah { animation: cursorMoveSarah 12s ease-in-out infinite; }
+.animate-alex { animation: cursorMoveAlex 15s ease-in-out infinite; }
+
+.typing-sim::after {
+  content: "Surpassed 2,000+ active users per workspace...";
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 4s steps(40, end) infinite alternate;
 }
 
-.landing-brand-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 24px;
-  font-weight: 700;
-  color: #e5e2e3;
-  letter-spacing: -0.02em;
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-.landing-logo-icon {
-  width: 32px;
-  height: 32px;
-  background-color: #c0c1ff;
-  color: #1000a9;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.landing-nav-links {
-  display: none;
-  align-items: center;
-  gap: 24px;
-}
-
-@media (min-width: 768px) {
-  .landing-nav-links {
-    display: flex;
-  }
-}
-
-.landing-nav-link {
-  font-size: 16px;
-  color: #c7c4d7;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.landing-nav-link:hover {
-  color: #c0c1ff;
-}
-
-.landing-nav-btn {
-  background-color: #8083ff;
-  color: #0d0096;
-  padding: 10px 24px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.landing-nav-btn:hover {
-  transform: scale(0.98);
-  background-color: #c0c1ff;
-}
-
-/* Primary CTA Button */
-.landing-cta-primary {
-  background-color: #6366f1;
-  color: #ffffff;
-  padding: 16px 36px;
-  border-radius: 12px;
-  font-size: 20px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.35);
-  transition: all 0.2s ease;
-}
-
-.landing-cta-primary:hover {
-  transform: scale(1.02);
-  box-shadow: 0 16px 32px rgba(99, 102, 241, 0.45);
-}
-
-.landing-cta-secondary {
-  background: rgba(53, 52, 54, 0.5);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #e5e2e3;
-  padding: 16px 28px;
-  border-radius: 12px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.landing-cta-secondary:hover {
-  background: rgba(53, 52, 54, 0.8);
+.mesh-gradient {
+  background-color: hsla(240,10%,5%,1);
+  background-image:
+    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225,39%,10%,1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339,49%,10%,1) 0, transparent 50%);
 }
