@@ -5,9 +5,8 @@ import documentService from '../services/documents';
 import historyService from '../services/history';
 import useSocket from '../hooks/useSocket';
 import axios from 'axios';
-import './DocumentEditorPage.css';
-
 import ShareModal from '../components/ShareModal';
+import './DocumentEditorPage.css';
 
 interface RoomUser {
   userId: string;
@@ -17,7 +16,6 @@ interface RoomUser {
 
 type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';
 
-// Helper function for human-readable timestamps
 function formatTimeAgo(isoString: string): string {
   const date = new Date(isoString);
   const now = new Date();
@@ -81,6 +79,9 @@ export const DocumentEditorPage: React.FC = () => {
   const handleOpenShareModal = () => {
     setShowShareModal(!showShareModal);
   };
+
+  // Right Side Panel Tab Selection
+  const [activeRightTab, setActiveRightTab] = useState<'comments' | 'activity' | 'outline'>('comments');
 
   // History Drawer State (Lazy Loaded)
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
@@ -277,7 +278,7 @@ export const DocumentEditorPage: React.FC = () => {
     };
   }, [id, socket, connected, document]);
 
-  // Lazy Load History on Panel Toggle
+  // Lazy Load History on Drawer Toggle
   const loadHistory = async (pageNum: number = 1, append: boolean = false) => {
     if (!id) return;
 
@@ -356,21 +357,22 @@ export const DocumentEditorPage: React.FC = () => {
     isRemoteEditRef.current = false;
   };
 
-
-
   if (loading) {
     return (
-      <div className="editor-page-wrapper" style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <p style={{ color: '#9ca3af' }}>Loading collaborative editor workspace...</p>
+      <div className="flex h-screen bg-[#0A0A0B] text-[#e5e2e3] items-center justify-center font-sans">
+        <p className="text-sm text-[#c7c4d7]">Loading collaborative editor workspace...</p>
       </div>
     );
   }
 
   if (error && !document) {
     return (
-      <div className="editor-page-wrapper" style={{ padding: '2rem' }}>
-        <div className="alert alert-error">{error}</div>
-        <button onClick={() => navigate('/documents')} className="back-btn" style={{ width: 'fit-content', marginTop: '1rem' }}>
+      <div className="flex flex-col h-screen bg-[#0A0A0B] text-[#e5e2e3] p-8 gap-4 font-sans">
+        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
+        <button
+          onClick={() => navigate('/documents')}
+          className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-xs font-bold hover:bg-white/10 transition-all self-start"
+        >
           ← Back to Documents
         </button>
       </div>
@@ -380,107 +382,308 @@ export const DocumentEditorPage: React.FC = () => {
   const isReadOnly = userRole === 'VIEWER';
 
   return (
-    <div className="editor-page-wrapper">
-      {/* Top Navigation & Status Bar */}
-      <div className="editor-top-bar">
-        <div className="editor-bar-left">
-          <button onClick={() => navigate('/documents')} className="back-btn">
-            ← Back
-          </button>
-          <span className={`status-badge status-${connected ? 'live' : connecting ? 'connecting' : 'disconnected'}`}>
-            {connected ? '● Live Socket' : connecting ? '🟡 Connecting' : '🔴 Disconnected'}
+    <div className="flex h-screen bg-[#0A0A0B] text-[#e5e2e3] font-sans overflow-hidden">
+      {/* Top Navigation Bar */}
+      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#131314]/80 backdrop-blur-2xl border-b border-white/5 shadow-md shadow-black/20">
+        <div className="flex items-center gap-4">
+          <span className="text-lg font-bold text-[#c0c1ff] tracking-tight">SyncDocs</span>
+          <div className="h-4 w-[1px] bg-white/10 mx-2"></div>
+          <span className="text-xs text-[#c7c4d7]/80 truncate max-w-[200px] font-medium">{title || 'Untitled Document'}</span>
+        </div>
+
+        <div className="hidden md:flex items-center gap-2 px-4 py-1.5 bg-white/[0.03] rounded-full border border-white/[0.05]">
+          <span className="material-symbols-outlined text-[#c0c1ff] text-[16px]">
+            {connected ? 'done_all' : connecting ? 'sync' : 'cloud_off'}
           </span>
-          <span className={`role-badge role-${userRole.toLowerCase()}`}>{userRole}</span>
+          <span className="text-[10px] font-semibold text-[#c7c4d7]/70 uppercase tracking-wider">
+            {connected ? 'Saved just now' : connecting ? 'Connecting...' : 'Offline'}
+          </span>
         </div>
 
-        <div className="editor-bar-actions">
-          {/* History Page Route Navigation */}
-          <button onClick={() => navigate(`/documents/${id}/history`)} className="back-btn">
-            📜 Version Control
-          </button>
+        <div className="flex items-center gap-4">
+          {/* Active Collaborators Presences */}
+          <div className="flex -space-x-2">
+            {activeRoomUsers.map((u, i) => (
+              <div
+                key={u.userId}
+                className="w-8 h-8 rounded-full border-2 border-[#131314] bg-[#571bc1] flex items-center justify-center text-[10px] font-bold text-white uppercase"
+                title={`${u.name} (${u.role})`}
+                style={{ zIndex: 10 + i }}
+              >
+                {u.name[0]}
+              </div>
+            ))}
+          </div>
 
-          {/* Share Modal Toggle */}
-          {userRole === 'OWNER' && (
-            <button onClick={handleOpenShareModal} className="back-btn" style={{ background: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 0.4)', color: '#ffffff' }}>
-              👥 Manage Sharing
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleToggleHistoryDrawer}
+              className={`p-2 text-[#c7c4d7] hover:bg-white/10 hover:text-[#e5e2e3] rounded-lg transition-all material-symbols-outlined text-[20px] ${
+                showHistoryDrawer ? 'bg-white/10 text-[#c0c1ff]' : ''
+              }`}
+              title="Version History"
+            >
+              history
             </button>
-          )}
-
-          {/* Auto-Save Status */}
-          {!isReadOnly && (
-            <span className={`save-status save-${saveStatus}`}>
-              {saveStatus === 'saving' && '● Saving...'}
-              {saveStatus === 'saved' && '✓ Saved'}
-              {saveStatus === 'unsaved' && '● Unsaved'}
-              {saveStatus === 'error' && '⚠ Save error'}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {error && <div className="alert alert-error">{error}</div>}
-
-      {/* Remote Edit Toast */}
-      {remoteNotice && (
-        <div className="alert" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7', marginBottom: '1rem' }}>
-          ⚡ {remoteNotice}
-        </div>
-      )}
-
-      {/* Active Presence Strip */}
-      <div className="presence-strip">
-        <span className="presence-label">Collaborators viewing room:</span>
-        <div className="presence-list">
-          {activeRoomUsers.length === 0 ? (
-            <span style={{ color: '#6b7280', fontStyle: 'italic' }}>Only you</span>
-          ) : (
-            activeRoomUsers.map((u) => (
-              <span key={u.userId} className={`presence-pill presence-${u.role.toLowerCase()}`}>
-                {u.name} ({u.role})
-              </span>
-            ))
-          )}
-        </div>
-      </div>
-
-      {isReadOnly && (
-        <div className="alert" style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', border: '1px solid #3b82f6', color: '#93c5fd', marginBottom: '1rem' }}>
-          ℹ Read-only viewer access. Edits are disabled for your account role.
-        </div>
-      )}
-
-      {/* History Drawer Overlay */}
-      {showHistoryDrawer && (
-        <div className="drawer-overlay">
-          <div className="drawer-header">
-            <h3 className="drawer-title">📜 Document History & Audit Logs</h3>
-            <button onClick={handleToggleHistoryDrawer} className="back-btn" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>
-              Close ✕
+            <button
+              onClick={() => navigate('/notifications')}
+              className="p-2 text-[#c7c4d7] hover:bg-white/10 hover:text-[#e5e2e3] rounded-lg transition-all material-symbols-outlined text-[20px]"
+              title="Notifications"
+            >
+              notifications
+            </button>
+            <button
+              onClick={() => navigate('/settings')}
+              className="p-2 text-[#c7c4d7] hover:bg-white/10 hover:text-[#e5e2e3] rounded-lg transition-all material-symbols-outlined text-[20px]"
+              title="Workspace Settings"
+            >
+              settings
             </button>
           </div>
 
-          {historyError && <div className="alert alert-error">{historyError}</div>}
+          {userRole === 'OWNER' && (
+            <button
+              onClick={handleOpenShareModal}
+              className="bg-[#c0c1ff] text-[#1000a9] px-4 py-1.5 rounded-lg text-xs font-bold hover:opacity-90 active:scale-95 transition-all ml-2"
+            >
+              Share
+            </button>
+          )}
+        </div>
+      </header>
+
+      {/* Side Navigation (Collapsed State) */}
+      <aside className="fixed left-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col py-6 w-[72px] bg-[#201f20] border-r border-white/5">
+        <div className="flex flex-col items-center gap-2 flex-1">
+          <button
+            onClick={() => navigate('/documents')}
+            className="flex items-center justify-center w-12 h-12 bg-white/10 text-[#c0c1ff] border-l-2 border-[#c0c1ff] transition-all"
+            title="Documents"
+          >
+            <span className="material-symbols-outlined">folder</span>
+          </button>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center justify-center w-12 h-12 text-[#c7c4d7] transition-all hover:bg-white/5 hover:text-[#e5e2e3]"
+            title="Dashboard"
+          >
+            <span className="material-symbols-outlined">dashboard</span>
+          </button>
+          <button
+            onClick={() => navigate('/profile')}
+            className="flex items-center justify-center w-12 h-12 text-[#c7c4d7] transition-all hover:bg-white/5 hover:text-[#e5e2e3]"
+            title="Profile"
+          >
+            <span className="material-symbols-outlined">person</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Workspace Canvas */}
+      <main className="flex-1 mt-16 ml-[72px] mr-[320px] flex flex-col relative bg-[#0e0e0f] overflow-hidden">
+        {/* Save Status & Notices */}
+        {remoteNotice && (
+          <div className="absolute top-4 left-6 right-6 z-40 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-xl flex items-center gap-2">
+            <span className="material-symbols-outlined text-[16px]">sync</span>
+            {remoteNotice}
+          </div>
+        )}
+
+        {error && (
+          <div className="absolute top-4 left-6 right-6 z-40 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl">
+            {error}
+          </div>
+        )}
+
+        {/* Floating Editor Rich-text Helper Toolbar */}
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-6 py-2 bg-[#131314]/70 backdrop-blur-md rounded-full border border-white/5 shadow-2xl">
+          <button className="p-2 rounded-lg hover:bg-white/10 text-[#e5e2e3]/80 hover:text-[#e5e2e3] transition-all material-symbols-outlined text-[20px]">
+            format_bold
+          </button>
+          <button className="p-2 rounded-lg hover:bg-white/10 text-[#e5e2e3]/80 hover:text-[#e5e2e3] transition-all material-symbols-outlined text-[20px]">
+            format_italic
+          </button>
+          <button className="p-2 rounded-lg hover:bg-white/10 text-[#e5e2e3]/80 hover:text-[#e5e2e3] transition-all material-symbols-outlined text-[20px]">
+            link
+          </button>
+          <div className="w-[1px] h-4 bg-white/10 mx-1"></div>
+          <button className="p-2 rounded-lg hover:bg-white/10 text-[#e5e2e3]/80 hover:text-[#e5e2e3] transition-all material-symbols-outlined text-[20px]">
+            format_list_bulleted
+          </button>
+          <button className="p-2 rounded-lg hover:bg-white/10 text-[#e5e2e3]/80 hover:text-[#e5e2e3] transition-all material-symbols-outlined text-[20px]">
+            code
+          </button>
+          <div className="w-[1px] h-4 bg-white/10 mx-1"></div>
+          <span className="px-3 py-1 text-xs text-[#c7c4d7] font-semibold">Normal text</span>
+        </div>
+
+        {/* Document Text Editor Area */}
+        <div className="flex-1 overflow-y-auto pt-28 pb-20 px-[5%]">
+          <article className="max-w-[840px] mx-auto bg-white/[0.03] border border-white/[0.02] rounded-xl p-8 shadow-2xl flex flex-col min-h-[500px]">
+            <input
+              type="text"
+              value={title}
+              onChange={handleTitleChange}
+              placeholder="Project Odyssey: Technical Specification"
+              disabled={isReadOnly}
+              className="bg-transparent border-none outline-none font-bold text-3xl text-[#e5e2e3] placeholder:text-[#c7c4d7]/40 w-full mb-6"
+            />
+            <textarea
+              value={content}
+              onChange={handleContentChange}
+              placeholder={isReadOnly ? 'Read-only document content.' : 'Start typing your document content here...'}
+              disabled={isReadOnly}
+              className="bg-transparent border-none outline-none text-[#c7c4d7] placeholder:text-[#c7c4d7]/20 w-full flex-1 resize-none leading-relaxed text-sm"
+            />
+          </article>
+        </div>
+
+        {/* Document Status Footer */}
+        <footer className="h-10 bg-[#131314] px-6 border-t border-white/5 flex items-center justify-between z-30">
+          <div className="flex items-center gap-6">
+            <span className="text-[10px] font-bold text-[#c7c4d7]/60 uppercase tracking-wider">
+              {content.trim() ? `${content.trim().split(/\s+/).length} words` : '0 words'}
+            </span>
+            <span className="text-[10px] font-bold text-[#c7c4d7]/60 uppercase tracking-wider">
+              Reading time: {Math.max(1, Math.round(content.trim().split(/\s+/).length / 200))} min
+            </span>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+              <span className="text-[10px] font-bold text-[#c7c4d7]/80 uppercase tracking-wider">Latency: 12ms</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-[14px] text-[#c0c1ff]">cloud_done</span>
+              <span className="text-[10px] font-bold text-[#e5e2e3] uppercase tracking-wider">Autosave: On</span>
+            </div>
+          </div>
+        </footer>
+      </main>
+
+      {/* Right Side Comments & Discussions Panel */}
+      <aside className="fixed right-0 top-16 h-[calc(100vh-64px)] w-[320px] bg-[#201f20] border-l border-white/5 flex flex-col z-40">
+        <div className="flex px-4 border-b border-white/5">
+          <button
+            onClick={() => setActiveRightTab('comments')}
+            className={`flex-1 py-4 text-xs font-bold text-center transition-all ${
+              activeRightTab === 'comments' ? 'text-[#c0c1ff] border-b-2 border-[#c0c1ff]' : 'text-[#c7c4d7]/70 hover:text-[#e5e2e3]'
+            }`}
+          >
+            Comments
+          </button>
+          <button
+            onClick={() => setActiveRightTab('activity')}
+            className={`flex-1 py-4 text-xs font-bold text-center transition-all ${
+              activeRightTab === 'activity' ? 'text-[#c0c1ff] border-b-2 border-[#c0c1ff]' : 'text-[#c7c4d7]/70 hover:text-[#e5e2e3]'
+            }`}
+          >
+            Activity
+          </button>
+          <button
+            onClick={() => setActiveRightTab('outline')}
+            className={`flex-1 py-4 text-xs font-bold text-center transition-all ${
+              activeRightTab === 'outline' ? 'text-[#c0c1ff] border-b-2 border-[#c0c1ff]' : 'text-[#c7c4d7]/70 hover:text-[#e5e2e3]'
+            }`}
+          >
+            Outline
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-6 no-scrollbar">
+          {activeRightTab === 'comments' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[#c0c1ff] font-bold tracking-tight">API Endpoints Discussion</span>
+                <span className="text-[10px] font-medium text-[#c7c4d7]/50 uppercase tracking-wider">Active</span>
+              </div>
+              <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-4">
+                <div className="flex gap-2">
+                  <div className="w-8 h-8 rounded-full bg-[#571bc1] flex items-center justify-center text-xs font-bold text-white uppercase">
+                    S
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-bold text-[#e5e2e3]">Sarah</span>
+                    <p className="text-xs text-[#c7c4d7] mt-1 leading-relaxed">
+                      Should we move the /v1/auth prefix to /v1/identity? It feels more aligned with our new IAM strategy.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeRightTab === 'activity' && (
+            <div className="space-y-4">
+              <h4 className="text-[10px] font-bold text-[#c7c4d7]/50 uppercase tracking-[0.2em]">Live Session Log</h4>
+              <div className="text-xs text-[#c7c4d7] italic">No remote workspace modifications registered yet.</div>
+            </div>
+          )}
+
+          {activeRightTab === 'outline' && (
+            <div className="space-y-4">
+              <h4 className="text-[10px] font-bold text-[#c7c4d7]/50 uppercase tracking-[0.2em]">Document Outline</h4>
+              <div className="space-y-2">
+                <div className="text-xs text-semibold text-[#c0c1ff] truncate">{title || 'Untitled Document'}</div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="p-4 border-t border-white/5 bg-[#2a2a2b]">
+          <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold transition-all border border-white/5">
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            <span>New Comment</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* History Drawer Overlay */}
+      {showHistoryDrawer && (
+        <div className="fixed right-[320px] top-16 h-[calc(100vh-64px)] w-[360px] bg-[#1c1b1c] border-l border-white/5 flex flex-col z-40 p-4 shadow-2xl overflow-y-auto">
+          <div className="flex justify-between items-center pb-4 border-b border-white/5 mb-4">
+            <h3 className="text-sm font-bold text-[#e5e2e3] flex items-center gap-1">
+              <span className="material-symbols-outlined text-sm">history</span> Edit Audit Log
+            </h3>
+            <button
+              onClick={handleToggleHistoryDrawer}
+              className="px-2.5 py-1 bg-white/5 rounded-lg text-[10px] font-bold text-[#e5e2e3] hover:bg-white/10"
+            >
+              Close
+            </button>
+          </div>
+
+          {historyError && (
+            <div className="p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+              {historyError}
+            </div>
+          )}
 
           {historyLoading && historyEvents.length === 0 ? (
-            <p style={{ color: '#9ca3af', textAlign: 'center' }}>Loading edit audit logs...</p>
+            <p className="text-xs text-[#c7c4d7] text-center py-8">Loading edit audit logs...</p>
           ) : historyEvents.length === 0 ? (
-            <p style={{ color: '#9ca3af', textAlign: 'center' }}>No edit history logged yet.</p>
+            <p className="text-xs text-[#c7c4d7] text-center py-8">No edit history logged yet.</p>
           ) : (
-            <div>
+            <div className="space-y-4">
               {historyEvents.map((evt) => (
-                <div key={evt.id} className="history-item-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                    <strong style={{ color: '#818cf8' }}>{evt.userName}</strong>
-                    <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{formatTimeAgo(evt.createdAt)}</span>
+                <div key={evt.id} className="p-3 bg-white/5 border border-white/5 rounded-xl space-y-2">
+                  <div className="flex justify-between items-start">
+                    <strong className="text-xs text-[#c0c1ff]">{evt.userName}</strong>
+                    <span className="text-[10px] text-[#c7c4d7]/60">{formatTimeAgo(evt.createdAt)}</span>
                   </div>
-                  <div style={{ fontSize: '0.85rem', color: '#d1d5db' }}>
+                  <div className="text-xs text-[#e5e2e3]">
                     <strong>Title:</strong> {evt.title}
                   </div>
                 </div>
               ))}
 
               {hasMoreHistory && (
-                <button onClick={handleLoadMoreHistory} className="back-btn" style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }} disabled={historyLoading}>
+                <button
+                  onClick={handleLoadMoreHistory}
+                  className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-lg text-xs text-[#c7c4d7]"
+                  disabled={historyLoading}
+                >
                   {historyLoading ? 'Loading...' : 'Load More'}
                 </button>
               )}
@@ -491,31 +694,8 @@ export const DocumentEditorPage: React.FC = () => {
 
       {/* Share / Access Modal Component */}
       {showShareModal && userRole === 'OWNER' && (
-        <ShareModal
-          documentId={id!}
-          documentTitle={title}
-          onClose={handleOpenShareModal}
-        />
+        <ShareModal documentId={id!} documentTitle={title} onClose={handleOpenShareModal} />
       )}
-
-      {/* Editor Main Canvas */}
-      <div className="editor-canvas-container">
-        <input
-          type="text"
-          className="modern-title-input"
-          value={title}
-          onChange={handleTitleChange}
-          placeholder="Document Title"
-          disabled={isReadOnly}
-        />
-        <textarea
-          className="modern-editor-textarea"
-          value={content}
-          onChange={handleContentChange}
-          placeholder={isReadOnly ? 'Read-only document content.' : 'Start typing your document content here...'}
-          disabled={isReadOnly}
-        />
-      </div>
     </div>
   );
 };
