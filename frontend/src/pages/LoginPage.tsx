@@ -147,19 +147,16 @@ export const LoginPage: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} className="login-form">
-            <div className="input-field-group">
-              <label htmlFor="email" className="input-label">Email Address</label>
-              <div className="input-relative">
-                <div className="input-icon-left">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
-                  </svg>
+            <div className="space-y-2">
+              <label htmlFor="email" className="font-medium text-xs text-[#c7c4d7] uppercase tracking-widest">Email Address</label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-[#c0c1ff] text-[#c7c4d7]/40 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[20px]">mail</span>
                 </div>
                 <input
                   id="email"
                   type="email"
-                  className="modern-input"
+                  className="w-full h-14 bg-[#131314] border border-white/10 rounded-xl px-6 pl-14 text-[#e5e2e3] placeholder:text-[#c7c4d7]/30 placeholder:font-normal placeholder:text-base focus:outline-none focus:border-[#c0c1ff] focus:ring-4 focus:ring-[#6366f1]/15 transition-all duration-200"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@company.com"
@@ -169,22 +166,19 @@ export const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="input-field-group">
-              <div className="input-label-row">
-                <label htmlFor="password" className="input-label">Password</label>
-                <a href="#" className="forgot-link" onClick={(e) => e.preventDefault()}>Forgot Password?</a>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <label htmlFor="password" className="font-medium text-xs text-[#c7c4d7] uppercase tracking-widest">Password</label>
+                <a href="#" className="text-xs text-[#c0c1ff] hover:text-white transition-colors" onClick={(e) => e.preventDefault()}>Forgot Password?</a>
               </div>
-              <div className="input-relative">
-                <div className="input-icon-left">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-[#c0c1ff] text-[#c7c4d7]/40 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[20px]">lock</span>
                 </div>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  className="modern-input modern-input-password"
+                  className="w-full h-14 bg-[#131314] border border-white/10 rounded-xl px-6 pl-14 pr-14 text-[#e5e2e3] placeholder:text-[#c7c4d7]/30 placeholder:font-normal placeholder:text-base focus:outline-none focus:border-[#c0c1ff] focus:ring-4 focus:ring-[#6366f1]/15 transition-all duration-200"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
@@ -193,24 +187,17 @@ export const LoginPage: React.FC = () => {
                 />
                 <button
                   type="button"
-                  className="input-icon-right"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#c7c4d7]/40 hover:text-[#e5e2e3] transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
-                  ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
+                  <span className="material-symbols-outlined text-[20px]">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
                 </button>
               </div>
             </div>
+
 
             <button type="submit" className="login-submit-btn" disabled={isSubmitting}>
               {isSubmitting ? 'Signing in...' : 'Sign In'}
