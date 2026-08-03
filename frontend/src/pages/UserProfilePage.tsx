@@ -8,11 +8,13 @@ export const UserProfilePage: React.FC = () => {
   // Profile Form State
   const [name, setName] = useState(user?.name || '');
   const [email] = useState(user?.email || '');
-  const [jobTitle, setJobTitle] = useState('Senior Product Engineer');
-  const [company, setCompany] = useState('SyncDocs HQ');
-  const [bio, setBio] = useState('Building real-time collaborative document synchronization architecture.');
-  const [timezone] = useState('GMT-08:00');
+  const [jobTitle, setJobTitle] = useState('Workspace Member');
+  const [company, setCompany] = useState('SyncDocs Workspace');
+  const [bio, setBio] = useState('Workspace member building collaborative docs.');
+  const [timezone] = useState('UTC');
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
+
+
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();

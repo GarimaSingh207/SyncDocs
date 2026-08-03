@@ -13,65 +13,12 @@ interface NotificationItem {
   timeGroup: 'Today' | 'Yesterday' | 'Older';
 }
 
-const INITIAL_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 'n1',
-    author: 'Sarah Chen',
-    action: 'commented on',
-    target: 'Backend Architecture',
-    snippet: '"We should consider using Redis for the new caching layer..."',
-    timestamp: '2m ago',
-    category: 'comment',
-    unread: true,
-    timeGroup: 'Today',
-  },
-  {
-    id: 'n2',
-    author: 'Rahul Mehta',
-    action: 'invited you to collaborate on',
-    target: 'Product Roadmap 2024',
-    timestamp: '1h ago',
-    category: 'invitation',
-    unread: true,
-    timeGroup: 'Today',
-  },
-  {
-    id: 'n3',
-    author: 'Emily Davis',
-    action: 'shared document',
-    target: 'API Documentation v2',
-    timestamp: 'Yesterday',
-    category: 'document',
-    unread: false,
-    timeGroup: 'Yesterday',
-  },
-  {
-    id: 'n4',
-    author: 'Alex Johnson',
-    action: 'mentioned you in',
-    target: 'Team Sync Notes',
-    snippet: '"@User please review the Q3 goals list before tomorrow."',
-    timestamp: 'Yesterday',
-    category: 'mention',
-    unread: false,
-    timeGroup: 'Yesterday',
-  },
-  {
-    id: 'n5',
-    author: 'SyncDocs System',
-    action: 'completed system update',
-    target: 'Engine v4.2 Deployment',
-    timestamp: '3 days ago',
-    category: 'system',
-    unread: false,
-    timeGroup: 'Older',
-  },
-];
-
 export const NotificationsPage: React.FC = () => {
-  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+
 
   const handleMarkAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));

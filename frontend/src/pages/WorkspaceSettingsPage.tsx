@@ -9,12 +9,14 @@ export const WorkspaceSettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
 
   // Form State
-  const [workspaceName, setWorkspaceName] = useState('SyncDocs Enterprise');
-  const [workspaceSlug, setWorkspaceSlug] = useState('syncdocs-pro');
-  const [description, setDescription] = useState('Centralized document collaboration & real-time sync engine workspace.');
-  const [timezone, setTimezone] = useState('GMT-08:00');
+  const [workspaceName, setWorkspaceName] = useState(user ? `${user.name}'s Workspace` : 'SyncDocs Workspace');
+  const [workspaceSlug, setWorkspaceSlug] = useState('syncdocs-workspace');
+  const [description, setDescription] = useState('Centralized document collaboration workspace.');
+  const [timezone, setTimezone] = useState('UTC');
   const [visibility, setVisibility] = useState<'private' | 'workspace' | 'public'>('private');
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
+
+
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
