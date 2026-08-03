@@ -2,9 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
-import Navbar from './components/Navbar';
-
 import ProtectedRoute from './components/ProtectedRoute';
+
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -23,7 +22,6 @@ export const App: React.FC = () => {
       <SocketProvider>
         <Router>
           <div className="app-container">
-            <Navbar />
             <main className="main-content">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
@@ -48,6 +46,7 @@ export const App: React.FC = () => {
     </AuthProvider>
   );
 };
+
 
 
 export default App;
