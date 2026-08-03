@@ -47,13 +47,13 @@ export const LandingPage: React.FC = () => {
       </nav>
 
       {/* Main Content */}
-      <main className="pt-32">
+      <main className="pt-28">
         {/* Hero Section */}
-        <section className="relative max-w-[1440px] mx-auto px-4 md:px-8 mb-48 min-h-[80vh] flex flex-col justify-center">
+        <section className="relative max-w-[1440px] mx-auto px-6 md:px-12 mb-36 min-h-[75vh] flex flex-col justify-center">
           <div className="hero-glow -top-40 -left-40"></div>
 
-          <div className="grid lg:grid-cols-[1fr,1.4fr] gap-8 items-center">
-            <div className="z-10 py-12">
+          <div className="grid lg:grid-cols-[1fr,1.3fr] gap-12 lg:gap-16 items-center">
+            <div className="z-10 py-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c0c1ff]/10 border border-[#c0c1ff]/20 text-[#c0c1ff] text-xs font-medium mb-6">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c0c1ff] opacity-75"></span>
@@ -62,27 +62,27 @@ export const LandingPage: React.FC = () => {
                 v2.0 is now live
               </div>
 
-              <h1 className="font-bold text-[56px] lg:text-[72px] text-[#e5e2e3] mb-6 leading-[1.05] tracking-tight">
+              <h1 className="font-bold text-[46px] lg:text-[60px] text-[#e5e2e3] mb-6 leading-[1.08] tracking-tight">
                 Collaborate in <br />
                 Real-Time.
                 <br />
                 <span className="text-[#c0c1ff]">Work Without Limits.</span>
               </h1>
 
-              <p className="text-lg text-[#c7c4d7] mb-10 max-w-xl leading-relaxed">
+              <p className="text-base lg:text-lg text-[#c7c4d7] mb-8 max-w-lg leading-relaxed">
                 Secure collaborative document editing powered by WebSockets, Role-Based Access Control, PostgreSQL, JWT Authentication and intelligent autosaving.
               </p>
 
               <div className="flex flex-col gap-8">
                 <div className="flex flex-wrap gap-4">
                   <button
-                    className="bg-[#6366F1] text-white px-12 py-6 rounded-xl text-2xl font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-2xl shadow-indigo-500/40 ring-2 ring-indigo-400/20 cursor-pointer"
+                    className="bg-[#6366F1] text-white px-10 py-4.5 rounded-xl text-xl font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-2xl shadow-indigo-500/40 ring-2 ring-indigo-400/20 cursor-pointer"
                     onClick={() => navigate('/register')}
                   >
                     Get Started Free
                   </button>
                   <button
-                    className="bg-[#353436]/50 backdrop-blur-md border border-white/10 text-[#e5e2e3] px-8 py-6 rounded-xl text-xl font-semibold hover:bg-[#353436] transition-all flex items-center gap-2 cursor-pointer"
+                    className="bg-[#353436]/50 backdrop-blur-md border border-white/10 text-[#e5e2e3] px-7 py-4.5 rounded-xl text-lg font-semibold hover:bg-[#353436] transition-all flex items-center gap-2 cursor-pointer"
                     onClick={() => navigate('/login')}
                   >
                     Watch Demo <span className="text-[#c0c1ff]">→</span>
@@ -90,7 +90,7 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 {/* Tech Badges */}
-                <div className="flex flex-wrap gap-4 items-center">
+                <div className="flex flex-wrap gap-3.5 items-center">
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/5 bg-white/[0.03] text-sm text-[#c7c4d7]">
                     <span className="material-symbols-outlined text-[16px] text-[#c0c1ff]">bolt</span>
                     WebSocket Powered
@@ -108,28 +108,29 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Interactive Hero Editor Mockup */}
-            <div className="relative lg:h-[800px] flex items-center justify-center mt-12 lg:mt-0">
+            <div className="relative lg:h-[680px] flex items-center justify-center mt-12 lg:mt-0">
               <div className="absolute inset-0 bg-gradient-to-tr from-[#c0c1ff]/20 via-[#d0bcff]/10 to-transparent blur-[120px] rounded-full opacity-60"></div>
               <div className="absolute inset-0 mesh-gradient opacity-30 rounded-3xl blur-[80px]"></div>
 
               {/* Floating Metrics */}
-              <div className="absolute -top-12 -left-4 z-30 glass-card px-5 py-2.5 rounded-full border-[#c0c1ff]/30 flex items-center gap-3 animate-bounce shadow-2xl" style={{ animationDuration: '4s' }}>
+              <div className="absolute -top-10 -left-2 z-30 glass-card px-4 py-2 rounded-full border-[#c0c1ff]/30 flex items-center gap-2.5 animate-bounce shadow-2xl" style={{ animationDuration: '4s' }}>
                 <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse"></div>
                 <span className="text-xs font-semibold text-[#e5e2e3]">12 collaborators online</span>
               </div>
 
-              <div className="absolute top-24 -right-16 z-30 glass-card px-4 py-2 rounded-full border-[#c0c1ff]/20 flex items-center gap-2 shadow-2xl">
-                <span className="material-symbols-outlined text-[18px] text-green-400">check_circle</span>
+              <div className="absolute top-20 -right-12 z-30 glass-card px-3.5 py-1.5 rounded-full border-[#c0c1ff]/20 flex items-center gap-2 shadow-2xl">
+                <span className="material-symbols-outlined text-[16px] text-green-400">check_circle</span>
                 <span className="text-xs text-[#e5e2e3]">Saved just now ✓</span>
               </div>
 
-              <div className="absolute bottom-16 -left-20 z-30 glass-card px-4 py-2 rounded-full border-[#c0c1ff]/20 flex items-center gap-2 shadow-2xl">
-                <span className="material-symbols-outlined text-[16px] text-[#c0c1ff]">wifi</span>
+              <div className="absolute bottom-12 -left-16 z-30 glass-card px-3.5 py-1.5 rounded-full border-[#c0c1ff]/20 flex items-center gap-2 shadow-2xl">
+                <span className="material-symbols-outlined text-[15px] text-[#c0c1ff]">wifi</span>
                 <span className="text-xs text-[#e5e2e3]">2.3ms Latency</span>
               </div>
 
               {/* Glassmorphic Editor Mockup */}
-              <div className="glass-card w-full lg:scale-[1.4] max-w-2xl rounded-xl overflow-hidden shadow-[0_0_120px_rgba(0,0,0,0.7)] border-white/10 z-20 transition-transform duration-700 hover:scale-[1.42]">
+              <div className="glass-card w-full lg:scale-[1.15] max-w-xl rounded-xl overflow-hidden shadow-[0_0_120px_rgba(0,0,0,0.7)] border-white/10 z-20 transition-transform duration-700 hover:scale-[1.18]">
+
                 {/* Toolbar */}
                 <div className="h-12 border-b border-white/5 bg-white/5 flex items-center justify-between px-4">
                   <div className="flex items-center gap-4">
