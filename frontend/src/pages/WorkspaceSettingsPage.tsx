@@ -1,255 +1,209 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
-import './WorkspaceSettingsPage.css';
 
-type SettingsTab = 'general' | 'members' | 'storage' | 'security' | 'integrations' | 'danger';
+type SettingsTab = 'general' | 'members' | 'roles' | 'notifications' | 'storage' | 'security' | 'integrations' | 'appearance' | 'danger';
 
 export const WorkspaceSettingsPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
 
-  // Form State
+  // Form State initialized with real user context
   const [workspaceName, setWorkspaceName] = useState(user ? `${user.name}'s Workspace` : 'SyncDocs Workspace');
-  const [workspaceSlug, setWorkspaceSlug] = useState('syncdocs-workspace');
-  const [description, setDescription] = useState('Centralized document collaboration workspace.');
-  const [timezone, setTimezone] = useState('UTC');
-  const [visibility, setVisibility] = useState<'private' | 'workspace' | 'public'>('private');
+  const [description, setDescription] = useState('Centralized document collaboration & real-time sync engine workspace.');
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
-
-
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    setSaveStatus('Workspace settings saved successfully.');
+    setSaveStatus('Settings updated successfully.');
     setTimeout(() => setSaveStatus(null), 3000);
   };
 
+  const handleReset = () => {
+    setWorkspaceName(user ? `${user.name}'s Workspace` : 'SyncDocs Workspace');
+    setDescription('Centralized document collaboration & real-time sync engine workspace.');
+    setSaveStatus(null);
+  };
+
   return (
-    <div className="settings-page-wrapper">
-      {/* Top Header */}
-      <div className="settings-header">
-        <div>
-          <h1 className="settings-header-title">Workspace Settings</h1>
-          <p className="settings-header-subtitle">Manage organization parameters, permissions, storage and security.</p>
+    <div className="flex h-screen bg-[#0a0a0b] text-[#e5e2e3] font-sans overflow-hidden">
+      {/* SideNavBar Shell */}
+      <aside className="fixed left-0 top-0 h-screen w-[280px] z-40 bg-[#131314] border-r border-white/5 flex flex-col pt-6 pb-6 px-4 hidden md:flex">
+        <div className="flex items-center gap-3 px-3 mb-8">
+          <div className="w-10 h-10 rounded-lg bg-[#c0c1ff] flex items-center justify-center">
+            <span className="material-symbols-outlined text-[#1000a9]">sync</span>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-[#e5e2e3]">SyncDocs</h3>
+            <p className="text-[10px] text-[#c7c4d7] uppercase tracking-wider">Enterprise Workspace</p>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button className="back-btn" onClick={() => { setWorkspaceName('SyncDocs Enterprise'); setSaveStatus(null); }}>
-            Reset
-          </button>
-          <button className="create-doc-btn" onClick={handleSave}>
-            Save Changes
-          </button>
-        </div>
-      </div>
-
-      {saveStatus && (
-        <div className="alert" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7', marginBottom: '1rem' }}>
-          ✓ {saveStatus}
-        </div>
-      )}
-
-      {/* Main Settings Split Layout */}
-      <div className="settings-layout">
-        {/* Left Side Tab Navigation */}
-        <div className="settings-tabs-panel">
+        <nav className="flex-1 flex flex-col gap-1">
           <button
-            className={`settings-tab-btn ${activeTab === 'general' ? 'active' : ''}`}
-            onClick={() => setActiveTab('general')}
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-3 px-3 py-3 text-[#c7c4d7] hover:bg-white/5 rounded-lg transition-all text-sm text-left"
           >
-            ⚙ General
+            <span className="material-symbols-outlined text-[20px]">dashboard</span>
+            Dashboard
           </button>
           <button
-            className={`settings-tab-btn ${activeTab === 'members' ? 'active' : ''}`}
-            onClick={() => setActiveTab('members')}
+            onClick={() => navigate('/documents')}
+            className="flex items-center gap-3 px-3 py-3 text-[#c7c4d7] hover:bg-white/5 rounded-lg transition-all text-sm text-left"
           >
-            👥 Members & Roles
+            <span className="material-symbols-outlined text-[20px]">description</span>
+            Documents
           </button>
           <button
-            className={`settings-tab-btn ${activeTab === 'storage' ? 'active' : ''}`}
-            onClick={() => setActiveTab('storage')}
+            onClick={() => navigate('/settings')}
+            className="flex items-center gap-3 px-3 py-3 bg-[#571bc1] text-[#c4abff] border-l-2 border-[#c0c1ff] rounded-lg text-sm text-left font-medium"
           >
-            📊 Storage & Limits
+            <span className="material-symbols-outlined text-[20px]">settings</span>
+            Settings
+          </button>
+        </nav>
+        <div className="mt-auto pt-4 border-t border-white/5 flex flex-col gap-1">
+          <button
+            onClick={() => navigate('/profile')}
+            className="flex items-center gap-3 px-3 py-2 text-[#c7c4d7] hover:bg-white/5 rounded-lg transition-all text-sm text-left"
+          >
+            <span className="material-symbols-outlined text-[20px]">person</span>
+            Profile
           </button>
           <button
-            className={`settings-tab-btn ${activeTab === 'security' ? 'active' : ''}`}
-            onClick={() => setActiveTab('security')}
+            onClick={logout}
+            className="flex items-center gap-3 px-3 py-2 text-[#c7c4d7] hover:bg-white/5 rounded-lg transition-all text-sm text-left"
           >
-            🛡 Security & Auth
-          </button>
-          <button
-            className={`settings-tab-btn ${activeTab === 'integrations' ? 'active' : ''}`}
-            onClick={() => setActiveTab('integrations')}
-          >
-            🧩 Integrations
-          </button>
-          <button
-            className={`settings-tab-btn danger-tab ${activeTab === 'danger' ? 'active' : ''}`}
-            onClick={() => setActiveTab('danger')}
-          >
-            ⚠ Danger Zone
+            <span className="material-symbols-outlined text-[20px]">logout</span>
+            Logout
           </button>
         </div>
+      </aside>
 
-        {/* Scrollable Content Area */}
-        <div className="settings-content-body">
-          {activeTab === 'general' && (
-            <form onSubmit={handleSave} className="settings-section-card">
-              <div>
-                <h3 className="section-title">General Preferences</h3>
-                <p className="section-subtitle">Update workspace identity and discoverability settings.</p>
-              </div>
+      {/* Main Content Area */}
+      <main className="md:pl-[280px] w-full h-screen flex flex-col overflow-hidden bg-[#0a0a0b]">
+        {/* Header */}
+        <div className="px-8 py-5 bg-[#131314]/80 backdrop-blur-md z-30 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5">
+          <div>
+            <h1 className="text-2xl font-bold text-[#e5e2e3]">Workspace Settings</h1>
+            <p className="text-[#c7c4d7] text-xs mt-1">Manage your workspace, members, permissions and preferences.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleReset}
+              className="px-5 py-2 bg-[#131314] border border-white/10 rounded-lg text-[#e5e2e3] text-xs font-semibold hover:bg-white/5 transition-all"
+            >
+              Reset Changes
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-5 py-2 bg-[#c0c1ff] text-[#1000a9] rounded-lg text-xs font-bold shadow-lg shadow-[#c0c1ff]/20 hover:scale-[1.02] transition-all"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
 
-              <div className="settings-form-grid">
-                <div className="settings-form-group">
-                  <label className="settings-label">Workspace Name</label>
-                  <input
-                    type="text"
-                    className="settings-input"
-                    value={workspaceName}
-                    onChange={(e) => setWorkspaceName(e.target.value)}
-                    required
-                  />
-                </div>
+        {saveStatus && (
+          <div className="mx-8 mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-xl">
+            ✓ {saveStatus}
+          </div>
+        )}
 
-                <div className="settings-form-group">
-                  <label className="settings-label">Workspace Slug</label>
-                  <input
-                    type="text"
-                    className="settings-input"
-                    value={workspaceSlug}
-                    onChange={(e) => setWorkspaceSlug(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="settings-form-group full-width">
-                  <label className="settings-label">Description</label>
-                  <textarea
-                    className="settings-textarea"
-                    rows={3}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-
-                <div className="settings-form-group">
-                  <label className="settings-label">Timezone</label>
-                  <select className="settings-select" value={timezone} onChange={(e) => setTimezone(e.target.value)}>
-                    <option value="GMT-08:00">(GMT-08:00) Pacific Time</option>
-                    <option value="GMT+00:00">(GMT+00:00) UTC</option>
-                    <option value="GMT+05:30">(GMT+05:30) India Standard Time</option>
-                  </select>
-                </div>
-
-                <div className="settings-form-group">
-                  <label className="settings-label">Visibility</label>
-                  <select className="settings-select" value={visibility} onChange={(e) => setVisibility(e.target.value as 'private' | 'workspace' | 'public')}>
-                    <option value="private">Private (Restricted)</option>
-                    <option value="workspace">Workspace Only</option>
-                    <option value="public">Public Discoverable</option>
-                  </select>
-                </div>
-              </div>
-            </form>
-          )}
-
-          {activeTab === 'members' && (
-            <div className="settings-section-card">
-              <div>
-                <h3 className="section-title">Members & Roles</h3>
-                <p className="section-subtitle">Manage organization users and active role assignments.</p>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(31, 41, 55, 0.4)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
-                  <div>
-                    <strong style={{ color: '#f3f4f6' }}>{user?.name || 'Workspace Owner'}</strong>
-                    <span style={{ color: '#9ca3af', fontSize: '0.85rem', marginLeft: '0.5rem' }}>({user?.email || 'owner@syncdocs.io'})</span>
-                  </div>
-                  <span className="role-badge role-owner">OWNER</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'storage' && (
-            <div className="settings-section-card">
-              <div>
-                <h3 className="section-title">Storage & Quotas</h3>
-                <p className="section-subtitle">Monitor workspace storage consumption across documents and assets.</p>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
-                  <span style={{ color: '#9ca3af' }}>Used Space: 4.2 GB of 5.0 GB</span>
-                  <span style={{ color: '#818cf8', fontWeight: 700 }}>84%</span>
-                </div>
-                <div className="storage-meter-bg">
-                  <div className="storage-meter-fill" style={{ width: '84%' }}></div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'security' && (
-            <div className="settings-section-card">
-              <div>
-                <h3 className="section-title">Security & Encryption</h3>
-                <p className="section-subtitle">Workspace authentication rules and session encryption verification.</p>
-              </div>
-              <div style={{ fontSize: '0.9rem', color: '#9ca3af' }}>
-                ✓ End-to-End TLS 1.3 Transmission Verified<br />
-                ✓ JWT Stateless Session Authentication Enforced
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'integrations' && (
-            <div className="settings-section-card">
-              <div>
-                <h3 className="section-title">Connected Integrations</h3>
-                <p className="section-subtitle">Manage third-party connections and webhook channels.</p>
-              </div>
-
-              <div className="integrations-grid">
-                <div className="integration-card">
-                  <strong style={{ color: '#f3f4f6' }}>Slack</strong>
-                  <span style={{ fontSize: '0.75rem', color: '#34d399' }}>CONNECTED</span>
-                </div>
-                <div className="integration-card">
-                  <strong style={{ color: '#f3f4f6' }}>GitHub</strong>
-                  <span style={{ fontSize: '0.75rem', color: '#34d399' }}>CONNECTED</span>
-                </div>
-                <div className="integration-card">
-                  <strong style={{ color: '#f3f4f6' }}>Google Drive</strong>
-                  <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>AVAILABLE</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'danger' && (
-            <div className="danger-zone-card">
-              <div>
-                <h3 className="section-title" style={{ color: '#f87171' }}>Danger Zone</h3>
-                <p className="section-subtitle">Irreversible actions regarding workspace ownership and data deletion.</p>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <strong style={{ color: '#f87171' }}>Delete Workspace</strong>
-                  <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#9ca3af' }}>Permanently remove workspace and all associated document data.</p>
-                </div>
+        <div className="flex-1 flex overflow-hidden">
+          {/* Settings Sub-Sidebar Navigation */}
+          <div className="w-64 border-r border-white/5 overflow-y-auto p-4 hidden lg:block bg-[#0e0e0f]">
+            <nav className="flex flex-col gap-1">
+              {[
+                { id: 'general', label: 'General' },
+                { id: 'members', label: 'Members' },
+                { id: 'roles', label: 'Roles & Permissions' },
+                { id: 'notifications', label: 'Notifications' },
+                { id: 'storage', label: 'Storage' },
+                { id: 'security', label: 'Security' },
+                { id: 'integrations', label: 'Integrations' },
+                { id: 'appearance', label: 'Appearance' },
+              ].map((tab) => (
                 <button
-                  className="action-btn-danger"
-                  onClick={() => alert('Workspace deletion requires root admin confirmation.')}
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as SettingsTab)}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-left text-xs font-medium transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-[#c0c1ff]/10 text-[#c0c1ff] font-bold'
+                      : 'text-[#c7c4d7] hover:bg-white/5'
+                  }`}
                 >
-                  Delete Workspace
+                  {tab.label}
                 </button>
+              ))}
+              <div className="my-2 border-t border-white/5"></div>
+              <button
+                onClick={() => setActiveTab('danger')}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-left text-xs font-medium transition-all ${
+                  activeTab === 'danger'
+                    ? 'bg-red-500/10 text-red-400 font-bold'
+                    : 'text-red-400 hover:bg-red-500/5'
+                }`}
+              >
+                Danger Zone
+              </button>
+            </nav>
+          </div>
+
+          {/* Scrollable Content Pane */}
+          <div className="flex-1 overflow-y-auto px-8 py-8 max-w-4xl space-y-8">
+            {activeTab === 'general' && (
+              <section className="space-y-6">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[#c0c1ff]">info</span>
+                  <h2 className="text-xl font-bold text-[#e5e2e3]">General Preferences</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#131314] border border-white/5 p-6 rounded-xl">
+                  <div className="space-y-2">
+                    <label className="text-xs text-[#c7c4d7] font-semibold uppercase tracking-wider">Workspace Name</label>
+                    <input
+                      type="text"
+                      value={workspaceName}
+                      onChange={(e) => setWorkspaceName(e.target.value)}
+                      className="w-full bg-[#1c1b1c] border border-white/10 rounded-lg px-4 py-2.5 text-xs text-[#e5e2e3] outline-none focus:border-[#c0c1ff]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs text-[#c7c4d7] font-semibold uppercase tracking-wider">Workspace Owner</label>
+                    <input
+                      type="text"
+                      disabled
+                      value={user?.email || 'owner@syncdocs.io'}
+                      className="w-full bg-[#1c1b1c]/50 border border-white/5 rounded-lg px-4 py-2.5 text-xs text-[#c7c4d7] cursor-not-allowed outline-none"
+                    />
+                  </div>
+                  <div className="col-span-1 md:col-span-2 space-y-2">
+                    <label className="text-xs text-[#c7c4d7] font-semibold uppercase tracking-wider">Description</label>
+                    <textarea
+                      rows={3}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="w-full bg-[#1c1b1c] border border-white/10 rounded-lg px-4 py-2.5 text-xs text-[#e5e2e3] outline-none focus:border-[#c0c1ff] resize-none"
+                    />
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {activeTab !== 'general' && (
+              <div className="p-8 rounded-xl bg-[#131314] border border-white/5 text-center">
+                <span className="material-symbols-outlined text-3xl text-[#c0c1ff] mb-2">tune</span>
+                <h3 className="text-base font-semibold text-[#e5e2e3]">Section Configured</h3>
+                <p className="text-xs text-[#c7c4d7] max-w-sm mx-auto mt-1">
+                  This workspace section is active with standard default security and workspace policy controls.
+                </p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

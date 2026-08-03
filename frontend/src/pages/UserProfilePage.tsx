@@ -1,218 +1,161 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
-import './UserProfilePage.css';
 
 export const UserProfilePage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  // Profile Form State
   const [name, setName] = useState(user?.name || '');
   const [email] = useState(user?.email || '');
-  const [jobTitle, setJobTitle] = useState('Workspace Member');
-  const [company, setCompany] = useState('SyncDocs Workspace');
-  const [bio, setBio] = useState('Workspace member building collaborative docs.');
-  const [timezone] = useState('UTC');
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
-
-
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    setSaveStatus('Profile updated successfully.');
+    setSaveStatus('Profile changes saved successfully.');
     setTimeout(() => setSaveStatus(null), 3000);
   };
 
-  const getInitials = (userName: string) => {
-    if (!userName) return 'U';
-    return userName
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .substring(0, 2)
-      .toUpperCase();
+  const handleDiscard = () => {
+    setName(user?.name || '');
+    setSaveStatus(null);
   };
 
   return (
-    <div className="profile-page-wrapper">
-      {/* Top Header */}
-      <div className="profile-header">
-        <div>
-          <h1 className="profile-header-title">My Account Profile</h1>
-          <p className="profile-header-subtitle">Manage personal information, security preferences, and active credentials.</p>
-        </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button className="back-btn" onClick={() => setName(user?.name || '')}>
-            Discard Changes
-          </button>
-          <button className="create-doc-btn" onClick={handleSave}>
-            Save Profile
-          </button>
-        </div>
-      </div>
-
-      {saveStatus && (
-        <div className="alert" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7', marginBottom: '1rem' }}>
-          ✓ {saveStatus}
-        </div>
-      )}
-
-      {/* Profile Overview Card */}
-      <div className="profile-banner-card">
-        <div className="avatar-large-wrapper">
-          <div className="avatar-circle-large">{getInitials(name)}</div>
-          <div className="status-online-dot" title="Active Account"></div>
-        </div>
-
-        <div className="profile-info-block">
-          <h2 className="profile-user-name">{name || 'SyncDocs User'}</h2>
-          <p className="profile-user-role">{jobTitle} @ {company}</p>
-
-          <div className="profile-meta-row">
-            <div className="profile-meta-item">
-              <span className="meta-label">Email Address</span>
-              <span className="meta-val">{email || 'user@syncdocs.io'}</span>
-            </div>
-            <div className="profile-meta-item">
-              <span className="meta-label">Role</span>
-              <span className="meta-val" style={{ color: '#818cf8' }}>MEMBER</span>
-            </div>
-            <div className="profile-meta-item">
-              <span className="meta-label">Timezone</span>
-              <span className="meta-val">{timezone}</span>
-            </div>
+    <div className="flex h-screen bg-[#0a0a0b] text-[#e5e2e3] font-sans overflow-hidden">
+      {/* SideNavBar Shell */}
+      <aside className="fixed left-0 top-0 h-screen w-64 z-40 bg-[#131314] border-r border-white/5 flex flex-col p-4 gap-2">
+        <div className="flex items-center gap-3 mb-6 px-2 pt-2">
+          <div className="h-10 w-10 bg-[#c0c1ff]/10 rounded-xl flex items-center justify-center border border-[#c0c1ff]/20">
+            <span className="material-symbols-outlined text-[#c0c1ff]">sync_alt</span>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-[#e5e2e3]">SyncDocs</h3>
+            <p className="text-[10px] uppercase tracking-widest text-[#c7c4d7]">Enterprise Pro</p>
           </div>
         </div>
-      </div>
+        <nav className="flex-1 space-y-1">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-[#c7c4d7] hover:text-[#e5e2e3] hover:bg-white/5 rounded-lg transition-all text-sm font-medium text-left"
+          >
+            <span className="material-symbols-outlined text-[20px]">dashboard</span>
+            Dashboard
+          </button>
+          <button
+            onClick={() => navigate('/documents')}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-[#c7c4d7] hover:text-[#e5e2e3] hover:bg-white/5 rounded-lg transition-all text-sm font-medium text-left"
+          >
+            <span className="material-symbols-outlined text-[20px]">description</span>
+            Documents
+          </button>
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-full flex items-center gap-3 px-4 py-2.5 bg-[#571bc1] text-[#c4abff] rounded-lg border-l-2 border-[#c0c1ff] text-sm font-medium text-left"
+          >
+            <span className="material-symbols-outlined text-[20px]">person</span>
+            Profile
+          </button>
+          <button
+            onClick={() => navigate('/settings')}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-[#c7c4d7] hover:text-[#e5e2e3] hover:bg-white/5 rounded-lg transition-all text-sm font-medium text-left"
+          >
+            <span className="material-symbols-outlined text-[20px]">settings</span>
+            Settings
+          </button>
+        </nav>
+        <button
+          onClick={logout}
+          className="mt-auto bg-white/5 hover:bg-white/10 text-[#e5e2e3] px-4 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2"
+        >
+          <span className="material-symbols-outlined text-sm">logout</span>
+          Logout
+        </button>
+      </aside>
 
-      {/* Account Statistics Bento Grid */}
-      <div className="profile-stats-grid">
-        <div className="stat-metric-card">
-          <span className="stat-number">12</span>
-          <span className="stat-label">Documents</span>
-        </div>
-        <div className="stat-metric-card">
-          <span className="stat-number">48</span>
-          <span className="stat-label">Edits Sync'd</span>
-        </div>
-        <div className="stat-metric-card">
-          <span className="stat-number">5</span>
-          <span className="stat-label">Collaborators</span>
-        </div>
-        <div className="stat-metric-card">
-          <span className="stat-number" style={{ color: '#34d399' }}>Active</span>
-          <span className="stat-label">Socket Status</span>
-        </div>
-      </div>
+      {/* Main Content Canvas */}
+      <main className="ml-64 w-full h-screen overflow-y-auto bg-[#0a0a0b] flex flex-col">
+        {/* Page Header */}
+        <header className="sticky top-0 z-30 px-8 py-5 bg-[#0a0a0b]/80 backdrop-blur-md flex justify-between items-center border-b border-white/5">
+          <div>
+            <h1 className="text-2xl font-bold text-[#e5e2e3]">My Profile</h1>
+            <p className="text-[#c7c4d7] text-xs mt-1">Manage your personal account details and preferences.</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleDiscard}
+              className="px-4 py-2 rounded-lg border border-white/10 text-[#e5e2e3] hover:bg-white/5 transition-all text-xs font-semibold"
+            >
+              Discard Changes
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 rounded-lg bg-[#c0c1ff] text-[#1000a9] hover:bg-[#d0bcff] transition-all text-xs font-bold shadow-lg shadow-[#c0c1ff]/20"
+            >
+              Save Changes
+            </button>
+          </div>
+        </header>
 
-      {/* Sections Grid */}
-      <div className="profile-sections-grid">
-        {/* Left Form Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <form onSubmit={handleSave} className="profile-card-section">
-            <h3 className="section-title">Personal Information</h3>
+        {saveStatus && (
+          <div className="mx-8 mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-xl">
+            ✓ {saveStatus}
+          </div>
+        )}
 
-            <div className="form-grid-2col">
-              <div className="settings-form-group">
-                <label className="settings-label">Full Name</label>
+        <div className="max-w-5xl mx-auto p-8 space-y-8 w-full">
+          {/* PROFILE OVERVIEW */}
+          <section className="bg-[#131314] border border-white/5 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+            <div className="w-24 h-24 rounded-2xl bg-[#6366f1] text-white text-3xl font-bold flex items-center justify-center border-2 border-[#c0c1ff]/20 shadow-xl">
+              {name ? name[0].toUpperCase() : 'U'}
+            </div>
+            <div className="flex-1 text-center md:text-left space-y-2">
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <h2 className="text-2xl font-bold text-[#e5e2e3]">{name || 'SyncDocs User'}</h2>
+                <span className="px-2 py-0.5 bg-[#c0c1ff]/10 text-[#c0c1ff] text-[10px] font-bold rounded uppercase tracking-widest self-center md:self-auto">
+                  Active
+                </span>
+              </div>
+              <p className="text-sm text-[#c7c4d7]">Workspace Member</p>
+              <div className="flex flex-wrap justify-center md:justify-start gap-8 mt-4">
+                <div className="flex flex-col">
+                  <span className="text-[#c7c4d7] text-[10px] uppercase font-semibold tracking-wider">Email Address</span>
+                  <span className="text-[#e5e2e3] text-xs font-medium">{email}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[#c7c4d7] text-[10px] uppercase font-semibold tracking-wider">Account Role</span>
+                  <span className="text-[#c0c1ff] text-xs font-bold uppercase">MEMBER</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* EDIT FORM */}
+          <form onSubmit={handleSave} className="bg-[#131314] border border-white/5 rounded-2xl p-8 space-y-6">
+            <h3 className="text-lg font-bold text-[#e5e2e3]">Personal Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs text-[#c7c4d7] font-semibold uppercase tracking-wider">Full Name</label>
                 <input
                   type="text"
-                  className="settings-input"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  required
+                  className="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-[#e5e2e3] outline-none focus:border-[#c0c1ff]"
                 />
               </div>
-
-              <div className="settings-form-group">
-                <label className="settings-label">Email (Read Only)</label>
+              <div className="space-y-2">
+                <label className="text-xs text-[#c7c4d7] font-semibold uppercase tracking-wider">Email Address</label>
                 <input
                   type="email"
-                  className="settings-input"
-                  value={email}
                   disabled
-                  style={{ opacity: 0.6, cursor: 'not-allowed' }}
-                />
-              </div>
-
-              <div className="settings-form-group">
-                <label className="settings-label">Job Title</label>
-                <input
-                  type="text"
-                  className="settings-input"
-                  value={jobTitle}
-                  onChange={(e) => setJobTitle(e.target.value)}
-                />
-              </div>
-
-              <div className="settings-form-group">
-                <label className="settings-label">Organization</label>
-                <input
-                  type="text"
-                  className="settings-input"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                />
-              </div>
-
-              <div className="settings-form-group full-width">
-                <label className="settings-label">Bio</label>
-                <textarea
-                  className="settings-textarea"
-                  rows={3}
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
+                  value={email}
+                  className="w-full bg-[#1c1b1c]/50 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-[#c7c4d7] cursor-not-allowed outline-none"
                 />
               </div>
             </div>
           </form>
-
-          <div className="profile-card-section">
-            <h3 className="section-title">Account Security</h3>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(31, 41, 55, 0.4)', padding: '0.85rem 1rem', borderRadius: '8px' }}>
-              <div>
-                <strong style={{ color: '#f3f4f6', fontSize: '0.9rem' }}>Password Authentication</strong>
-                <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#9ca3af' }}>Managed securely via hashed session tokens.</p>
-              </div>
-              <button className="copy-link-btn" onClick={() => alert('Password changes can be performed via standard auth flow.')}>
-                Change Password
-              </button>
-            </div>
-          </div>
         </div>
-
-        {/* Right Sidebar Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div className="profile-card-section">
-            <h3 className="section-title">Appearance & Mode</h3>
-
-            <div className="settings-form-group">
-              <label className="settings-label">Theme Mode</label>
-              <select className="settings-select" defaultValue="dark">
-                <option value="dark">Dark Theme (Default)</option>
-                <option value="system">System Preference</option>
-              </select>
-            </div>
-
-            <div className="settings-form-group">
-              <label className="settings-label">Interface Accent</label>
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
-                <span style={{ width: 24, height: 24, borderRadius: '50%', background: '#6366f1', border: '2px solid #fff' }}></span>
-                <span style={{ width: 24, height: 24, borderRadius: '50%', background: '#10b981', opacity: 0.5 }}></span>
-                <span style={{ width: 24, height: 24, borderRadius: '50%', background: '#f59e0b', opacity: 0.5 }}></span>
-              </div>
-            </div>
-          </div>
-
-          <div className="danger-zone-card">
-            <h3 className="section-title" style={{ color: '#f87171' }}>Account Deactivation</h3>
-            <p style={{ margin: 0, fontSize: '0.8rem', color: '#9ca3af' }}>Temporarily disable or request permanent removal of user profile data.</p>
-            <button className="action-btn-danger" onClick={() => alert('Account deactivation requires email verification.')}>
-              Deactivate Account
-            </button>
-          </div>
-        </div>
-      </div>
+      </main>
     </div>
   );
 };
