@@ -281,7 +281,7 @@ export const DocumentsPage: React.FC = () => {
                       <div className="text-xs text-[#c7c4d7]">
                         {new Date(doc.updatedAt).toLocaleDateString()}
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex items-center justify-end gap-2">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -291,6 +291,24 @@ export const DocumentsPage: React.FC = () => {
                         >
                           Open
                         </button>
+                        {activeTab === 'my' && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Are you sure you want to delete "${doc.title}"?`)) {
+                                try {
+                                  await documentService.deleteDocument(doc.id);
+                                  setMyDocuments((prev) => prev.filter((d) => d.id !== doc.id));
+                                } catch {
+                                  alert('Failed to delete document.');
+                                }
+                              }
+                            }}
+                            className="px-3 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg transition-all"
+                          >
+                            Delete
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -310,8 +328,28 @@ export const DocumentsPage: React.FC = () => {
                       </div>
                       <h4 className="font-semibold text-sm text-[#e5e2e3] truncate">{doc.title}</h4>
                     </div>
-                    <div className="text-[11px] text-[#c7c4d7]">
-                      {new Date(doc.updatedAt).toLocaleDateString()}
+                    <div className="flex justify-between items-end">
+                      <div className="text-[11px] text-[#c7c4d7]">
+                        {new Date(doc.updatedAt).toLocaleDateString()}
+                      </div>
+                      {activeTab === 'my' && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`Are you sure you want to delete "${doc.title}"?`)) {
+                              try {
+                                await documentService.deleteDocument(doc.id);
+                                setMyDocuments((prev) => prev.filter((d) => d.id !== doc.id));
+                              } catch {
+                                alert('Failed to delete document.');
+                              }
+                            }
+                          }}
+                          className="px-2 py-0.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[10px] font-semibold rounded transition-all"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
