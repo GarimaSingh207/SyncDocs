@@ -1,10 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
-import useAuth from './hooks/useAuth';
 import Navbar from './components/Navbar';
+
 import ProtectedRoute from './components/ProtectedRoute';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -16,12 +17,6 @@ import UserProfilePage from './pages/UserProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
 import './App.css';
 
-const HomeRedirect: React.FC = () => {
-  const { user, loading } = useAuth();
-  if (loading) return null;
-  return user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />;
-};
-
 export const App: React.FC = () => {
   return (
     <AuthProvider>
@@ -31,7 +26,7 @@ export const App: React.FC = () => {
             <Navbar />
             <main className="main-content">
               <Routes>
-                <Route path="/" element={<HomeRedirect />} />
+                <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 
@@ -53,6 +48,7 @@ export const App: React.FC = () => {
     </AuthProvider>
   );
 };
+
 
 export default App;
 
