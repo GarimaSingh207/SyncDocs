@@ -594,22 +594,10 @@ export const DocumentEditorPage: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-6 no-scrollbar">
           {activeRightTab === 'comments' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-[#c0c1ff] font-bold tracking-tight">API Endpoints Discussion</span>
-                <span className="text-[10px] font-medium text-[#c7c4d7]/50 uppercase tracking-wider">Active</span>
-              </div>
-              <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-4">
-                <div className="flex gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#571bc1] flex items-center justify-center text-xs font-bold text-white uppercase">
-                    S
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs font-bold text-[#e5e2e3]">Sarah</span>
-                    <p className="text-xs text-[#c7c4d7] mt-1 leading-relaxed">
-                      Should we move the /v1/auth prefix to /v1/identity? It feels more aligned with our new IAM strategy.
-                    </p>
-                  </div>
-                </div>
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <span className="material-symbols-outlined text-[32px] text-[#c7c4d7]/30 mb-2">forum</span>
+                <p className="text-xs text-[#c7c4d7]/70">No comments yet</p>
+                <p className="text-[10px] text-[#c7c4d7]/40 mt-1">Start a discussion by clicking the button below.</p>
               </div>
             </div>
           )}

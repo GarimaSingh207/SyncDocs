@@ -12,6 +12,7 @@
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+  scroll-padding-top: 5rem; /* 80px h-20 header offset */
 }
 
 /* Glassmorphic Cards */
